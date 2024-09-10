@@ -1,9 +1,14 @@
 <?php
-// Database connection settings
-$db = new mysqli('hostname', 'username', 'password', 'database');
+$host = 'localhost';
+$dbname = 'farm_market';
+$username = 'root';
+$password = '';
 
-// Check connection
-if ($db->connect_error) {
-    die('Connection failed: ' . $db->connect_error);
+try {
+    $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    echo "Connected successfully!";
+} catch (PDOException $e) {
+    echo "Connection failed: " . $e->getMessage();
 }
 ?>

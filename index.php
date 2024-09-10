@@ -1,21 +1,21 @@
 <?php
-// Include your database connection
+
 include('db_connection.php');
 
-// Fetch data to display on the dashboard (you can adjust these queries to match your database)
+// Fetch data to display on the dashboard 
 $totalUsersQuery = "SELECT COUNT(*) as total_users FROM users";
 $totalProductsQuery = "SELECT COUNT(*) as total_products FROM products WHERE status = 'pending'";
 $totalOrdersQuery = "SELECT COUNT(*) as total_orders FROM orders WHERE status = 'pending'";
 
 // Execute the queries
-$totalUsersResult = $db->query($totalUsersQuery);
-$totalProductsResult = $db->query($totalProductsQuery);
-$totalOrdersResult = $db->query($totalOrdersQuery);
+$totalUsersResult = $conn->query($totalUsersQuery);
+$totalProductsResult = $conn->query($totalProductsQuery);
+$totalOrdersResult = $conn->query($totalOrdersQuery);
 
 // Fetch the counts
-$totalUsers = $totalUsersResult->fetch_assoc()['total_users'];
-$totalProducts = $totalProductsResult->fetch_assoc()['total_products'];
-$totalOrders = $totalOrdersResult->fetch_assoc()['total_orders'];
+$totalUsers = $totalUsersResult->fetch(PDO::FETCH_ASSOC)['total_users'];
+$totalProducts = $totalProductsResult->fetch(PDO::FETCH_ASSOC)['total_products'];
+$totalOrders = $totalOrdersResult->fetch(PDO::FETCH_ASSOC)['total_orders'];
 ?>
 
 <!DOCTYPE html>
@@ -24,7 +24,7 @@ $totalOrders = $totalOrdersResult->fetch_assoc()['total_orders'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link your CSS file -->
+    <link rel="stylesheet" href="styles.css"> 
 </head>
 <body>
     <div class="container">
