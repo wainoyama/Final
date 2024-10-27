@@ -1,24 +1,36 @@
- 
 <?php
-// Handle login logic here if needed
+$validUsername = 'BSIT Student';
+$validPassword = '1234';
+
+$message = '';
+
+if (isset($_POST['submit'])) { 
+    $username = $_POST['username'] ?? '';
+    $password = $_POST['password'] ?? '';
+
+    if ($username === $validUsername && $password === $validPassword) {
+        $message = 'Welcome, ' . $username . '!'; // or yung command na nag reredirect sa home page
+    } else {
+        $message = 'Invalid username or password.';
+    }
+}
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>Login</title>
 </head>
 <body>
-    <h1>Login</h1>
-    <form method="post" action="login_process.php">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-        <input type="submit" value="Login">
+    <h2>Login</h2>
+    <form method='post'>
+        <p>Username: <input type='text' name='username' required></p>
+        <p>Password: <input type='password' name='password' required></p>
+        <p><input type='submit' name='submit' value='Login'></p> 
     </form>
+
+    <p>
+        <?php echo $message; ?>
+    </p>
 </body>
 </html>
