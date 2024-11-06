@@ -1,0 +1,41 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+}
+
+.post-btn, .delete-btn, .like-btn, .buy-btn {
+    background-color: #20c425;
+    color: white;
+    border: 1px solid rgb(12, 63, 12);
+    padding: 10px;
+    cursor: pointer;
+
+}
+
+.post-content {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.comments-section {
+    margin-top: 10px;
+}
+
+.comments-section ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.comments-section li {
+    border: 1px solid #ddd;
+    padding: 5px;
+    margin-top: 5px;
+    border-radius: 3px;
+}
