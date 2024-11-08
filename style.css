@@ -1,0 +1,95 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f1f1f1;
+}
+
+.chat-container {
+    max-width: 600px;
+    margin: 30px auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    height: 600px;
+    overflow-y: auto;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.message {
+    display: flex;
+    margin-bottom: 15px;
+    padding: 5px;
+}
+
+.message.bot {
+    justify-content: flex-start;
+}
+
+.message.user {
+    justify-content: flex-end;
+}
+
+.message-text {
+    max-width: 60%;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.message.bot .message-text {
+    background-color: #e6e6e6;
+    color: #333;
+}
+
+.message.user .message-text {
+    background-color: #4CAF50;
+    color: white;
+    text-align: right;
+}
+
+/* Input styling */
+input[type="text"] {
+    width: calc(100% - 100px);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+input[type="submit"] {
+    padding: 10px;
+    border: 1px solid #4CAF50;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.questions-list {
+    margin-top: 30px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.questions-list h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.questions-list ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.questions-list ul li {
+    margin-bottom: 8px;
+}
