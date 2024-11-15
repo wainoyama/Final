@@ -6,5 +6,6 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-echo "Welcome, " . $_SESSION['name'];
+echo "Welcome, " . $_SESSION['name'] . "\n" .
+"Sorry wala pang nakalagay dito. Pero dito sana ang Home page or something :D";
 ?>
