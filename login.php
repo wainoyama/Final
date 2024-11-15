@@ -1,41 +1,53 @@
-    <?php
-    $validUsername = 'BSIT Student';
-    $validPassword = '1234';
+<?php
+include('db.php');
 
-    $message = '';
+$message = '';
 
-    if (isset($_POST['submit'])) { 
-        $username = $_POST['username'] ?? '';
-        $password = $_POST['password'] ?? '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-        if ($username === $validUsername && $password === $validPassword) {
-header('Location: index.php'); 
-exit;
-} else {
-            $message = 'Invalid username or password.';
+    $sql = "SELECT * FROM users WHERE email = '$email'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+
+        if (password_verify($password, $user['password'])) {
+            session_start();
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['name'] = $user['name'];
+            $_SESSION['role'] = $user['role'];
+            header('Location: setting1.php');  
+            exit;
+        } else {
+            $message = 'Invalid password.';
         }
+    } else {
+        $message = 'No user found with that email.';
     }
-    ?>
+}
+?>
 
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Login</title>
-    </head>
-    <body>
-        <h2>Login</h2>
-        <form method='post'>
-            <p>Username: <input type='text' name='username' required></p>
-            <p>Password: <input type='password' name='password' required></p>
-            <p><input type='submit' name='submit' value='Login'></p> 
-        </form>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <form method="POST">
+        <label>Email:</label>
+        <input type="email" name="email" required><br>
 
-        <p>
-            <?php echo $message; ?>
-        </p>
+        <label>Password:</label>
+        <input type="password" name="password" required><br>
 
-        <p>
-            Dont have an account? <a href="signup.php">Click here to sign up</a>
-        </p>
-    </body>
-    </html>
+        <button type="submit">Login</button>
+    </form>
+
+    <p><?php echo $message; ?></p>
+    
+    <p>Don't have an account? <a href="register.php">Register here</a></p>
+</body>
+</html>
