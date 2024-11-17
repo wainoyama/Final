@@ -1,11 +1,19 @@
 <?php
-require_once 'classes/Post.php';
+require_once 'database_connection.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['post_id'])) {
-    $post = new Post();
-    $postId = $_POST['post_id'];
-    $post->deletePost($postId);
+if (isset($_GET['id'])) {
+    $postId = (int) $_GET['id'];
+
+    if ($postId > 0) {
+        $stmt = $db->prepare("DELETE FROM posts WHERE id = ?");
+        if ($stmt->execute([$postId])) {
+            header('Location: /index.php');
+            exit();
+        } else {
+            echo "Error deleting the post.";
+        }
+    } else {
+        echo "Invalid post ID.";
+    }
 }
-
-header('Location: upload_post.php');
-exit;
+?>

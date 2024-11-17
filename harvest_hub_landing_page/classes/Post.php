@@ -1,97 +1,77 @@
 <?php
-
 class Post
 {
-    private $filePath = 'posts.json';
+    private $db;
 
-    public function __construct()
+    public function __construct($db)
     {
-        // Initialize posts file if it doesn't exist
-        if (!file_exists($this->filePath)) {
-            file_put_contents($this->filePath, json_encode([]));
-        }
+        $this->db = $db;
     }
 
-    // Create a new post
     public function createPost($message, $photo, $forSale)
     {
-        $posts = $this->getPosts();
-        $newPost = [
-            'id' => time(),
-            'message' => $message,
-            'photo' => $photo,
-            'for_sale' => $forSale,
-            'timestamp' => time(),
-            'comments' => []
-        ];
-        $posts[] = $newPost;
-        file_put_contents($this->filePath, json_encode($posts));
+        $stmt = $this->db->prepare("INSERT INTO posts (message, photo, for_sale) VALUES (?, ?, ?)");
+        $stmt->execute([$message, $photo, $forSale]);
     }
 
-    // Get all posts
     public function getPosts()
     {
-        return json_decode(file_get_contents($this->filePath), true);
+        $stmt = $this->db->query("SELECT posts.*, 
+                                  (SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.id) as like_count,
+                                  (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) as comment_count
+                                  FROM posts ORDER BY timestamp DESC");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Get post by ID
     public function getPostById($id)
     {
-        $posts = $this->getPosts();
-        foreach ($posts as $post) {
-            if ($post['id'] == $id) {
-                return $post;
-            }
-        }
-        return null;
+        $stmt = $this->db->prepare("SELECT * FROM posts WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Delete post by ID
     public function deletePost($id)
     {
-        $posts = $this->getPosts();
-        foreach ($posts as $key => $post) {
-            if ($post['id'] == $id) {
-                unset($posts[$key]);
-                file_put_contents($this->filePath, json_encode(array_values($posts)));
-                return true;
-            }
-        }
-        return false;
+        $stmt = $this->db->prepare("DELETE FROM posts WHERE id = ?");
+        return $stmt->execute([$id]);
     }
 
-    // Edit a post
     public function editPost($id, $message, $photo, $forSale)
     {
-        $posts = $this->getPosts();
-        foreach ($posts as &$post) {
-            if ($post['id'] == $id) {
-                $post['message'] = $message;
-                $post['photo'] = $photo;
-                $post['for_sale'] = $forSale;
-                file_put_contents($this->filePath, json_encode($posts));
-                return true;
-            }
-        }
-        return false;
+        $stmt = $this->db->prepare("UPDATE posts SET message = ?, photo = ?, for_sale = ? WHERE id = ?");
+        return $stmt->execute([$message, $photo, $forSale, $id]);
     }
 
-    // Add a comment to a post
     public function addComment($postId, $message, $author = 'Anonymous')
     {
-        $posts = $this->getPosts();
-        foreach ($posts as &$post) {
-            if ($post['id'] == $postId) {
-                $post['comments'][] = [
-                    'message' => $message,
-                    'author' => $author,
-                    'timestamp' => time()
-                ];
-                file_put_contents($this->filePath, json_encode($posts));
-                return true;
-            }
-        }
-        return false;
+        $stmt = $this->db->prepare("INSERT INTO comments (post_id, message, author, timestamp) VALUES (?, ?, ?, NOW())");
+        return $stmt->execute([$postId, $message, $author]);
+    }
+
+    public function getComments($postId)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM comments WHERE post_id = ? ORDER BY timestamp ASC");
+        $stmt->execute([$postId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function addLike($postId)
+    {
+        $stmt = $this->db->prepare("INSERT INTO likes (post_id, timestamp) VALUES (?, NOW())");
+        return $stmt->execute([$postId]);
+    }
+
+    public function removeLike($postId)
+    {
+        $stmt = $this->db->prepare("DELETE FROM likes WHERE post_id = ?");
+        return $stmt->execute([$postId]);
+    }
+
+    public function isLiked($postId)
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM likes WHERE post_id = ?");
+        $stmt->execute([$postId]);
+        return $stmt->fetchColumn() > 0;
     }
 }
 ?>
