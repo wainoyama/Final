@@ -1,17 +1,14 @@
 <?php
-include_once 'Database.php';
-include_once 'Admin.php';
+$admin_username = "admin";
+$admin_password = "admin123";
 
-$database = new Database();
-$db = $database->getConnection();
-
-$admin = new Admin($db);
 $error_message = "";
 
 if (isset($_POST['submit'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
-    if ($admin->login($username, $password)) {
+
+    if ($username === $admin_username && $password === $admin_password) {
         header("Location: dashboard.php");
         exit();
     } else {
@@ -26,18 +23,21 @@ if (isset($_POST['submit'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
+    <link rel="stylesheet" href="./css/admin_page.css">
 </head>
 <body>
     <h2>Admin Login</h2>
-    <?php if ($error_message != "") { echo "<p style='color:red;'>$error_message</p>"; } ?>
-    <form action="dashboard.php" method="POST">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
+    <div class="form-container">
+        <?php if ($error_message != "") { echo "<p class='error'>$error_message</p>"; } ?>
+        <form action="admin_login.php" method="POST">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
 
-        <button type="submit" name="submit">Login</button>
-    </form>
+            <button type="submit" name="submit">Login</button>
+        </form>
+    </div>
 </body>
 </html>

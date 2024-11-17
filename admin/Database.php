@@ -1,9 +1,9 @@
 <?php
 class Database {
     private $host = "localhost";
-    private $db_name = "admin";
-    private $username = "root";
-    private $password = "";
+    private $db_name = ""; 
+    private $username = "root"; 
+    private $password = ""; 
     public $conn;
 
     public function getConnection() {
@@ -19,4 +19,3 @@ class Database {
         return $this->conn;
     }
 }
-?>
