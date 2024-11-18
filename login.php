@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['name'] = $user['name'];
             $_SESSION['role'] = $user['role'];
-            header('Location: setting1.php');  
+            header('Location: profile_page/profile.php');  // Redirect to profile page
             exit;
         } else {
             $message = 'Invalid password.';
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
     <p><?php echo $message; ?></p>
-    
+
     <p>Don't have an account? <a href="register.php">Register here</a></p>
 </body>
 </html>

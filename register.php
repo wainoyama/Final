@@ -16,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         move_uploaded_file($_FILES['profilePicture']['tmp_name'], $profilePicture);
     }
 
-
     $sql = 'SELECT * FROM users WHERE email = ?';
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('s', $email);
@@ -29,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         $sql = 'INSERT INTO users (name, email, phone, password, location, photo) 
-                VALUES ( ?, ?, ?, ?, ?, ?)';
+                VALUES (?, ?, ?, ?, ?, ?)';
         $stmt = $conn->prepare($sql);
         $stmt->bind_param(
             'ssssss',
@@ -39,7 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $hashedPassword,
             $location,
             $profilePicture
-        
         );
 
         if ($stmt->execute()) {
@@ -84,10 +82,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <label for="location">Location:</label>
         <input type="text" name="location" value="<?php echo $location; ?>" required><br><br>
 
-
         <label for="profilePicture">Profile Picture:</label>
         <input type="file" name="profilePicture" accept="image/*"><br><br>
-
 
         <button type="submit">Register</button>
     </form>
