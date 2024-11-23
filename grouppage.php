@@ -6,27 +6,32 @@ if (!isset($_SESSION['posts'])) {
 }
 
 if (isset($_POST['join_group'])) {
+    session_regenerate_id(true); 
     $_SESSION['joined'] = true;
+    $feedback = "You have joined the group!";
 }
 
 if (isset($_POST['post_content']) && $_SESSION['joined']) {
-    $username = htmlspecialchars($_POST['username']);
-    $content = htmlspecialchars($_POST['content']);
+    $username = htmlspecialchars(trim($_POST['username']));
+    $content = htmlspecialchars(trim($_POST['content']));
     $timestamp = date("Y-m-d H:i:s");
 
-    if (!empty($username) && !empty($content)) {
+   
+    if (!empty($username) && !empty($content) && strlen($username) <= 50 && strlen($content) <= 500) {
         $_SESSION['posts'][] = [
             'username' => $username,
             'content' => $content,
             'timestamp' => $timestamp
         ];
+        $feedback = "Post submitted successfully!";
+    } else {
+        $feedback = "Please enter valid username and content.";
     }
 }
 
 if (isset($_POST['leave_group'])) {
-    session_destroy();
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit;
+    unset($_SESSION['joined']); // Just unset joined variable
+    $feedback = "You have left the group.";
 }
 ?>
 
@@ -39,7 +44,7 @@ if (isset($_POST['leave_group'])) {
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Welcome to the Group</h1>
+    <h1>Welcome to the Harvest Hub Group Page</h1>
 
     <div class="rules">
         <h2>Rules and Guidelines</h2>
@@ -49,6 +54,11 @@ if (isset($_POST['leave_group'])) {
             <li>Follow the group purpose and stay on topic.</li>
         </ul>
     </div>
+
+    
+    <?php if (isset($feedback) && $feedback !== "You have joined the group!"): ?>
+        <p><strong><?php echo $feedback; ?></strong></p>
+    <?php endif; ?>
 
     <?php if (!isset($_SESSION['joined'])): ?>
         <form method="POST">
@@ -65,10 +75,10 @@ if (isset($_POST['leave_group'])) {
             <h2>Post Content</h2>
             <form method="POST">
                 <label for="username">Your Name:</label><br>
-                <input type="text" id="username" name="username" required><br><br>
+                <input type="text" id="username" name="username" required maxlength="50"><br><br>
 
                 <label for="content">Your Post:</label><br>
-                <textarea id="content" name="content" rows="4" cols="50" required></textarea><br><br>
+                <textarea id="content" name="content" rows="4" cols="50" required maxlength="500"></textarea><br><br>
 
                 <button type="submit" name="post_content">Post</button>
             </form>
