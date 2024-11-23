@@ -9,7 +9,6 @@ if (isset($_POST['join_group'])) {
     $_SESSION['joined'] = true;
 }
 
-// Handle the "Post Content" form submission
 if (isset($_POST['post_content']) && $_SESSION['joined']) {
     $username = htmlspecialchars($_POST['username']);
     $content = htmlspecialchars($_POST['content']);
