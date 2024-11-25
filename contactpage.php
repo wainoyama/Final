@@ -18,7 +18,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!DOCTYPE html>
 <head>
-  <meta charset="UTF-8" />
   <title>Contact Us - CALABARZON Harvest Hub</title>
   <link rel="stylesheet" href="contactpage.css" />
 </head>
