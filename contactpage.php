@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <header>
     <nav>
       <ul>
-        <li><a href="index.php">Home</a></li>
+        <li><a href="index.php">Home</a></li> 
         <li><a href="aboutpage.php">About</a></li>
         <li><a href="contactpage.php">Contact</a></li>
       </ul>
