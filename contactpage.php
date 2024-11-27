@@ -1,5 +1,8 @@
 <?php
+include('db.php'); 
+
 $error_message = '';
+$success_message = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = htmlspecialchars(trim($_POST['name']));
@@ -11,7 +14,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error_message = "Please enter a valid email address.";
     } else {
-        $error_message = "Thank you for reaching out! Your message has been received.";
+        $stmt = $conn->prepare("INSERT INTO contact_messages (name, email, message) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $name, $email, $message);
+
+        if ($stmt->execute()) {
+            $success_message = "Thank you for reaching out! We have received your message.";
+        } else {
+            $error_message = "There was an error submitting your message. Please try again later.";
+        }
+        $stmt->close();
     }
 }
 ?>
@@ -23,39 +34,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 
-  <header>
-    <nav>
-      <ul>
-        <li><a href="index.php">Home</a></li> 
-        <li><a href="aboutpage.php">About</a></li>
-        <li><a href="contactpage.php">Contact</a></li>
-      </ul>
-    </nav>
-    <h1 class="project-name">CALABARZON Harvest Hub</h1>
-  </header>
+<header>
+  <nav>
+    <ul>
+      <li><a href="index.php">Home</a></li>
+      <li><a href="aboutpage.php">About</a></li>
+      <li><a href="contactpage.php">Contact</a></li>
+    </ul>
+  </nav>
+  <h1 class="project-name">CALABARZON Harvest Hub</h1>
+</header>
 
-  <div class="container">
-    <h2>Contact Us</h2>
+<div class="container">
+  <h2>Contact Us</h2>
 
-    <?php if (!empty($error_message)): ?>
-      <div class="error-message">
-        <p><?php echo htmlspecialchars($error_message); ?></p>
-      </div>
-    <?php endif; ?>
+  <?php if (!empty($error_message)): ?>
+    <div class="error-message">
+      <p><?php echo htmlspecialchars($error_message); ?></p>
+    </div>
+  <?php endif; ?>
 
-    <form action="contactpage.php" method="POST" class="contact-form">
-      <label for="name">Your Name:</label>
-      <input type="text" id="name" name="name" placeholder="Your Name" value="<?php echo isset($name) ? htmlspecialchars($name) : ''; ?>" required />
+  <?php if (!empty($success_message)): ?>
+    <div class="success-message">
+      <p><?php echo htmlspecialchars($success_message); ?></p>
+    </div>
+  <?php endif; ?>
 
-      <label for="email">Your Email:</label>
-      <input type="email" id="email" name="email" placeholder="Your Email" value="<?php echo isset($email) ? htmlspecialchars($email) : ''; ?>" required />
+  <form action="contactpage.php" method="POST" class="contact-form">
+    <label for="name">Your Name:</label>
+    <input type="text" id="name" name="name" placeholder="Your Name" value="<?php echo isset($name) ? htmlspecialchars($name) : ''; ?>" required />
 
-      <label for="message">Your Message:</label>
-      <textarea id="message" name="message" rows="5" placeholder="Your Message" required><?php echo isset($message) ? htmlspecialchars($message) : ''; ?></textarea>
+    <label for="email">Your Email:</label>
+    <input type="email" id="email" name="email" placeholder="Your Email" value="<?php echo isset($email) ? htmlspecialchars($email) : ''; ?>" required />
 
-      <button type="submit" class="submit-button">Submit</button>
-    </form>
-  </div>
+    <label for="message">Your Message:</label>
+    <textarea id="message" name="message" rows="5" placeholder="Your Message" required><?php echo isset($message) ? htmlspecialchars($message) : ''; ?></textarea>
+
+    <button type="submit" class="submit-button">Submit</button>
+  </form>
+</div>
 
 </body>
 </html>
