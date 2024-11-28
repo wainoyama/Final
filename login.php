@@ -18,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['name'] = $user['name'];
             $_SESSION['role'] = $user['role'];
-            // Redirect to return URL if set, otherwise go to index
             $return_to = isset($_GET['return']) ? $_GET['return'] : 'index.php';
             header('Location: ' . filter_var($return_to, FILTER_SANITIZE_URL));  
             exit;

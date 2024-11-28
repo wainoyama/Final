@@ -1,3 +1,11 @@
+<?php
+session_start();
+
+function isLoggedIn() {
+    return isset($_SESSION['user_id']);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,19 +17,23 @@
 </head>
 <body>
     <div class="container">
-        <header>
+    <header>
             <div class="header-content">
                 <div class="logo">
                     <span>Harvest Hub</span>
                 </div>
                 <nav>
-                    <a href="index.php" class="active"><i class="fas fa-home"></i> Home</a>
+                    <a href="index.php"><i class="fas fa-home"></i> Home</a>
                     <a href="community.php"><i class="fas fa-users"></i> Community</a>
                     <a href="profile.php"><i class="fas fa-user"></i> Profile</a>
                 </nav>
                 <div class="auth-buttons">
-                    <a href="login.php" class="btn-login">Log In</a>
-                    <a href="register.php" class="btn-signup">Sign Up</a>
+                    <?php if (isLoggedIn()): ?>
+                        <a href="logout.php" class="btn-logout">Log Out</a>
+                    <?php else: ?>
+                        <a href="login.php" class="btn-login">Log In</a>
+                        <a href="register.php" class="btn-signup">Sign Up</a>
+                    <?php endif; ?>
                 </div>
             </div>
         </header>
@@ -48,9 +60,10 @@
                 </div>
                 <div class="feature-box">
                     <i class="fas fa-shopping-basket"></i>
-                    <h2>Marketplace</h2>
-                    <p>Buy and sell fresh, locally-grown produce.</p>
-                    <a href="marketplace.php" class="btn">Visit Marketplace</a>
+                    <h2>About Us</h2>
+                    <p>Learn more about us! <br> click here!
+                    </p>
+                    <a href="aboutus.php" class="btn">About Us</a>
                 </div>
                 <div class="feature-box">
                     <i class="fas fa-seedling"></i>
@@ -99,4 +112,3 @@
     </div>
 </body>
 </html>
-
