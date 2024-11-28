@@ -51,10 +51,10 @@ class Post
         return $stmt->execute();
     }
 
-    public function addComment($postId, $content, $userId)
+    public function addComment($postId, $content)
     {
         $stmt = $this->db->prepare("INSERT INTO comments (post_id, user_id, content) VALUES (?, ?, ?)");
-        $stmt->bind_param("iis", $postId, $userId, $content);
+        $stmt->bind_param("iis", $postId, $content);
         return $stmt->execute();
     }
 

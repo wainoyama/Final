@@ -1,0 +1,219 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    background-color: rgb(201, 201, 201);
+    color: #1c1e21;
+    line-height: 1.5;
+}
+
+h1, h2 {
+    color: #0ac700;
+    margin-bottom: 20px;
+}
+
+/* Container and Layout */
+.container {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header Styles */
+header {
+    background-color: #ffffff;
+    padding: 15px 0;
+    border-bottom: 1px solid #dddfe2;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-radius: 20px;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0ac700;
+    text-decoration: none;
+}
+
+nav {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+nav a {
+    text-decoration: none;
+    color: #1c1e21;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+nav a:hover, nav a.active {
+    background-color: #f0f2f5;
+    color: #0ac700;
+}
+
+.auth-buttons a, .btn-login, .btn-signup {
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+.btn-login {
+    color: #1c1e21;
+}
+
+.btn-signup {
+    background-color: #0ac700;
+    color: white;
+}
+
+.btn-signup:hover {
+    background-color: #098f00;
+}
+
+/* Section and Table Styles */
+.section {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dddfe2;
+}
+
+th {
+    background-color: #f0f2f5;
+    font-weight: 600;
+    color: #0ac700;
+}
+
+tr:hover {
+    background-color: #f0f2f5;
+}
+
+/* List Styles */
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f0f2f5;
+    border-radius: 8px;
+}
+
+strong {
+    color: #0ac700;
+}
+
+/* Buttons */
+.btn, .btn-large, .btn-logout, .btn-primary {
+    background-color: #0ac700;
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.btn:hover, .btn-primary:hover, .btn-logout:hover {
+    background-color: #098f00;
+}
+
+.btn-logout {
+    background-color: #f44336;
+}
+
+.btn-logout:hover {
+    background-color: #d32f2f;
+}
+
+/* Form Styles */
+.login-form, .auth-form {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input {
+    padding: 10px;
+    border: 1px solid #dddfe2;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.login-btn, .btn-primary {
+    width: 100%;
+    cursor: pointer;
+}
+
+.error-messages, .message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .header-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    table, th, td {
+        font-size: 14px;
+    }
+}

@@ -7,18 +7,17 @@
 
 body {
     font-family: "Segoe UI", Helvetica, Arial, sans-serif;
-    background-color: #f8f9fa;
+    background-color: rgb(201, 201, 201);
     color: #1c1e21;
     line-height: 1.5;
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1500px;
     margin: 0 auto;
     padding: 20px;
 }
 
-/* Header styles */
 header {
     background-color: #ffffff;
     padding: 15px 0;
@@ -28,13 +27,14 @@ header {
     position: sticky;
     top: 0;
     z-index: 1000;
+    border-radius: 20px;
 }
 
 .header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -186,7 +186,6 @@ nav a:hover, nav a.active {
     background-color: #098f00;
 }
 
-/* CTA section styles */
 .cta-section {
     text-align: center;
     background-color: #f0f2f5;
@@ -209,7 +208,6 @@ nav a:hover, nav a.active {
     padding: 12px 24px;
 }
 
-/* Footer styles */
 footer {
     background-color: #ffffff;
     border-top: 1px solid #dddfe2;
@@ -293,8 +291,20 @@ footer {
         margin-bottom: 30px;
     }
 }
+.btn-logout {
+    background-color: #f44336;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
 
-/* Login page styles */
+.btn-logout:hover {
+    background-color: #d32f2f;
+}
+
 .login-form {
     max-width: 400px;
     margin: 0 auto;

@@ -1,4 +1,3 @@
-/* Reset and base styles */
 * {
     margin: 0;
     padding: 0;
@@ -7,18 +6,17 @@
 
 body {
     font-family: "Segoe UI", Helvetica, Arial, sans-serif;
-    background-color: #f8f9fa;
+    background-color: rgb(201, 201, 201);
     color: #1c1e21;
     line-height: 1.5;
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1500px;
     margin: 0 auto;
     padding: 20px;
 }
 
-/* Header styles */
 header {
     background-color: #ffffff;
     padding: 15px 0;
@@ -28,13 +26,14 @@ header {
     position: sticky;
     top: 0;
     z-index: 1000;
+    border-radius: 20px;
 }
 
 .header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -87,16 +86,17 @@ nav a:hover, nav a.active {
     background-color: #098f00;
 }
 
-/* Content styles */
 .content {
+    margin-top: -10px;
     background: #ffffff;
     border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
     padding: 20px;
     margin-bottom: 20px;
+    width: 500px;
+    margin-left: 30rem;
 }
 
-/* Community-specific styles */
 .upload-post {
     background: #ffffff;
     border-radius: 8px;
@@ -267,7 +267,20 @@ nav a:hover, nav a.active {
     font-size: 14px;
 }
 
-/* Responsive styles */
+.btn-logout {
+    background-color: #f44336;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+.btn-logout:hover {
+    background-color: #d32f2f;
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 10px;
@@ -293,4 +306,3 @@ nav a:hover, nav a.active {
         flex-direction: column;
     }
 }
-
