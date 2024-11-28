@@ -1,4 +1,3 @@
-/* Reset and base styles */
 * {
     margin: 0;
     padding: 0;
@@ -18,7 +17,6 @@ body {
     padding: 20px;
 }
 
-/* Header styles */
 header {
     background-color: #ffffff;
     padding: 15px 0;
@@ -88,7 +86,6 @@ nav a:hover, nav a.active {
     background-color: #098f00;
 }
 
-/* Content styles */
 .content {
     margin-top: -10px;
     background: #ffffff;
@@ -100,9 +97,7 @@ nav a:hover, nav a.active {
     margin-left: 30rem;
 }
 
-/* Community-specific styles */
 .upload-post {
-    
     background: #ffffff;
     border-radius: 8px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -286,7 +281,6 @@ nav a:hover, nav a.active {
     background-color: #d32f2f;
 }
 
-/* Responsive styles */
 @media (max-width: 768px) {
     .container {
         padding: 10px;
@@ -312,4 +306,3 @@ nav a:hover, nav a.active {
         flex-direction: column;
     }
 }
-

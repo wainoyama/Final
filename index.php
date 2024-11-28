@@ -1,9 +1,5 @@
 <?php
-session_start();
-
-function isLoggedIn() {
-    return isset($_SESSION['user_id']);
-}
+require_once 'auth_check.php';
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +8,7 @@ function isLoggedIn() {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Harvest Hub Landing Page</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -61,8 +57,8 @@ function isLoggedIn() {
                 <div class="feature-box">
                     <i class="fas fa-shopping-basket"></i>
                     <h2>About Us</h2>
-                    <p>Learn more about us! <br> click here!
-                    </p>
+                    <p>Learn more about us!
+</p>
                     <a href="aboutus.php" class="btn">About Us</a>
                 </div>
                 <div class="feature-box">
@@ -71,12 +67,6 @@ function isLoggedIn() {
                     <p>Access farming tips, guides, and sustainable practices.</p>
                     <a href="resources.php" class="btn">View Resources</a>
                 </div>
-            </div>
-
-            <div class="cta-section">
-                <h2>Ready to get started?</h2>
-                <p>Join Harvest Hub today and be part of our growing community!</p>
-                <a href="register.php" class="btn btn-large">Sign Up Now</a>
             </div>
         </div>
 
@@ -90,9 +80,6 @@ function isLoggedIn() {
                     <h3>Quick Links</h3>
                     <ul>
                         <li><a href="about.php">About Us</a></li>
-                        <li><a href="contact.php">Contact</a></li>
-                        <li><a href="privacy.php">Privacy Policy</a></li>
-                        <li><a href="terms.php">Terms of Service</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
@@ -106,7 +93,7 @@ function isLoggedIn() {
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2023 Harvest Hub. All rights reserved.</p>
+                <p>&copy; 2024 Harvest Hub. All rights reserved.</p>
             </div>
         </footer>
     </div>

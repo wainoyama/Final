@@ -18,7 +18,6 @@ body {
     padding: 20px;
 }
 
-/* Header styles */
 header {
     background-color: #ffffff;
     padding: 15px 0;
@@ -35,7 +34,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -187,7 +186,6 @@ nav a:hover, nav a.active {
     background-color: #098f00;
 }
 
-/* CTA section styles */
 .cta-section {
     text-align: center;
     background-color: #f0f2f5;
@@ -210,7 +208,6 @@ nav a:hover, nav a.active {
     padding: 12px 24px;
 }
 
-/* Footer styles */
 footer {
     background-color: #ffffff;
     border-top: 1px solid #dddfe2;
@@ -308,7 +305,6 @@ footer {
     background-color: #d32f2f;
 }
 
-/* Login page styles */
 .login-form {
     max-width: 400px;
     margin: 0 auto;

@@ -56,24 +56,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Harvest Hub</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./css/register.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <header>
-            <div class="header-content">
-                <div class="logo">
-                    <span>Harvest Hub</span>
-                </div>
-                <nav>
-                    <a href="index.php"><i class="fas fa-home"></i> Home</a>
-                    <a href="community.php"><i class="fas fa-users"></i> Community</a>
-                    <a href="profile.php"><i class="fas fa-user"></i> Profile</a>
-                </nav>
-            </div>
-        </header>
-
         <div class="content">
             <div class="auth-form">
                 <h2>Create an Account</h2>
@@ -109,7 +96,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     <div class="form-group">
                         <label for="location">Location:</label>
-                        <input type="text" id="location" name="location" value="<?php echo htmlspecialchars($location); ?>" required>
+                        <select id="location" name="location" required>
+                            <option value="">Select Location</option>
+                            <option value="Cavite">Cavite</option>
+                            <option value="Laguna">Laguna</option>
+                            <option value="Batangas">Batangas</option>
+                            <option value="Quezon">Quezon</option>
+                            <option value="Rizal">Rizal</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -126,36 +120,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </div>
 
-        <footer>
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>About Harvest Hub</h3>
-                    <p>Connecting farmers and consumers for a sustainable future.</p>
-                </div>
-                <div class="footer-section">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="about.php">About Us</a></li>
-                        <li><a href="contact.php">Contact</a></li>
-                        <li><a href="privacy.php">Privacy Policy</a></li>
-                        <li><a href="terms.php">Terms of Service</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Connect With Us</h3>
-                    <div class="social-icons">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2023 Harvest Hub. All rights reserved.</p>
-            </div>
-        </footer>
     </div>
 </body>
 </html>
-

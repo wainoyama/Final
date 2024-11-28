@@ -1,10 +1,6 @@
 <?php
-session_start();
 require_once 'db.php';
-
-function isLoggedIn() {
-    return isset($_SESSION['user_id']);
-}
+require_once 'auth_check.php';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -125,8 +121,8 @@ $posts = $post->getPosts();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Harvest Hub Community</title>
-    <link rel="stylesheet" href="./harvest_hub_landing_page/style.css">
-    <link rel="stylesheet" href="./harvest_hub_landing_page/community_additional.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/community_additional.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
