@@ -3,7 +3,7 @@
     ["name" => "Emman", "role" => "Role Placeholder", "tasks" => "Tasks Placeholder", "img" => "emman.jpg"],
     ["name" => "Paul", "role" => "Role Placeholder", "tasks" => "Tasks Placeholder", "img" => "paul.jpg"],
     ["name" => "Klyzza", "role" => "Role Placeholder", "tasks" => "Tasks Placeholder", "img" => "klyzza.jpg"]
-  ];
+  ]; 
 ?>
 <!DOCTYPE html>
 <head>
