@@ -21,7 +21,7 @@ require_once 'auth_check.php';
                 <nav>
                     <a href="index.php"><i class="fas fa-home"></i> Home</a>
                     <a href="community.php"><i class="fas fa-users"></i> Community</a>
-                    <a href="profile.php"><i class="fas fa-user"></i> Profile</a>
+                    <a href="./profile_page/profile.php"><i class="fas fa-user"></i> Profile</a>
                 </nav>
                 <div class="auth-buttons">
                     <?php if (isLoggedIn()): ?>

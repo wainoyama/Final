@@ -8,16 +8,20 @@ if (empty($_SESSION['csrf_token'])) {
 
 require_once './harvest_hub_landing_page/classes/Post.php';
 
-$post = new Post($conn);
+$postManager = new Post($conn);
 
-// Initialize user's groups if not set
+$posts = $postManager->getPosts();
+usort($posts, function($a, $b) {
+    return strtotime($b['timestamp']) - strtotime($a['timestamp']);
+});
+
 if (!isset($_SESSION['user_groups'])) {
     $_SESSION['user_groups'] = [];
 }
 
-// Define available groups
+// Modify the $available_groups array to separate cities
 $available_groups = [
-    'calabarzon' => ['Cavite', 'Batangas', 'Laguna', 'Quezon', 'Rizal'],
+    'cities' => ['Cavite', 'Batangas', 'Laguna', 'Quezon', 'Rizal'],
     'farming' => ['Farming Tips'],
     'specialty' => ['Organic Farmers Network', 'Crop Exchange Hub']
 ];
@@ -35,15 +39,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
             $fileName = basename($_FILES['photo']['name']);
             $sanitizedFileName = preg_replace("/[^a-zA-Z0-9\._-]/", "_", $fileName);
-
             $uploadDir = __DIR__ . '/harvest_hub_landing_page/uploads/';
             if (!file_exists($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
             }
-
             $uploadFile = $uploadDir . $sanitizedFileName;
             $photoUrl = '/harvest_hub_landing_page/uploads/' . $sanitizedFileName;
-
             $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
             $fileType = $_FILES['photo']['type'];
 
@@ -52,67 +53,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($_FILES['photo']['size'] <= $maxFileSize) {
                     if (move_uploaded_file($_FILES['photo']['tmp_name'], $uploadFile)) {
                         $photo = $photoUrl;
-                    } else {
-                        echo "File upload failed. Please try again.";
                     }
-                } else {
-                    echo "The file is too large. Maximum size allowed is 40MB.";
                 }
-            } else {
-                echo "Invalid file type. Only JPEG, PNG, and GIF are allowed.";
             }
         }
 
-        $post->createPost($message, $photo, $for_sale);
+        $newPostId = $postManager->createPost($message, $photo, $for_sale);
+        if ($newPostId) {
+            $posts = $postManager->getPosts();
+            usort($posts, function($a, $b) {
+                return strtotime($b['timestamp']) - strtotime($a['timestamp']);
+            });
+        }
     } elseif (isset($_POST['like'])) {
         $postId = $_POST['post_id'];
-        if ($post->isLiked($postId)) {
-            $post->removeLike($postId);
+        $userId = $_SESSION['user_id'];
+        if ($postManager->isLiked($postId, $userId)) {
+            $postManager->removeLike($postId, $userId);
         } else {
-            $post->addLike($postId);
+            $postManager->addLike($postId, $userId);
         }
     } elseif (isset($_POST['comment'])) {
         $postId = $_POST['post_id'];
         $comment = $_POST['comment_text'];
-        $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
-        $post->addComment($postId, $comment, $userId);
+        $userId = $_SESSION['user_id'];
+        $postManager->addComment($postId, $comment, $userId);
     }
-
-    // Group management
-    if (isset($_POST['join_group'])) {
-        $group = $_POST['group'];
-        if (!in_array($group, $_SESSION['user_groups'])) {
-            $_SESSION['user_groups'][] = $group;
-        }
-    } elseif (isset($_POST['leave_group'])) {
-        $group = $_POST['group'];
-        $index = array_search($group, $_SESSION['user_groups']);
-        if ($index !== false) {
-            unset($_SESSION['user_groups'][$index]);
-        }
-    } elseif (isset($_POST['post_content']) && !empty($_SESSION['user_groups'])) {
-        $username = htmlspecialchars($_POST['username']);
-        $content = htmlspecialchars($_POST['content']);
-        $group = $_POST['group'];
-        $timestamp = date("Y-m-d H:i:s");
-
-        if (!empty($username) && !empty($content) && in_array($group, $_SESSION['user_groups'])) {
-            if (!isset($_SESSION['group_posts'][$group])) {
-                $_SESSION['group_posts'][$group] = [];
-            }
-            $_SESSION['group_posts'][$group][] = [
-                'username' => $username,
-                'content' => $content,
-                'timestamp' => $timestamp
-            ];
-        }
-    }
-
-    header("Location: ./community.php");
-    exit();
 }
 
-$posts = $post->getPosts();
+$posts = $postManager->getPosts();
+usort($posts, function($a, $b) {
+    return strtotime($b['timestamp']) - strtotime($a['timestamp']);
+});
 ?>
 
 <!DOCTYPE html>
@@ -124,6 +96,20 @@ $posts = $post->getPosts();
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/community_additional.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .post {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .post:last-child {
+            border-bottom: none;
+        }
+        .posts {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -135,7 +121,7 @@ $posts = $post->getPosts();
                 <nav>
                     <a href="index.php"><i class="fas fa-home"></i> Home</a>
                     <a href="community.php"><i class="fas fa-users"></i> Community</a>
-                    <a href="profile.php"><i class="fas fa-user"></i> Profile</a>
+                    <a href="./profile_page/profile.php"><i class="fas fa-user"></i> Profile</a>
                 </nav>
                 <div class="auth-buttons">
                     <?php if (isLoggedIn()): ?>
@@ -149,13 +135,12 @@ $posts = $post->getPosts();
         </header>
         
         <div class="community-layout">
-            <!-- Group Section (Left Column) -->
             <div class="group-section">
                 <h2>Community Groups</h2>
 
                 <div class="group-list">
                     <h3>CALABARZON Cities</h3>
-                    <?php foreach ($available_groups['calabarzon'] as $city): ?>
+                    <?php foreach ($available_groups['cities'] as $city): ?>
                         <?php echo createGroupButton($city); ?>
                     <?php endforeach; ?>
 
@@ -178,9 +163,28 @@ $posts = $post->getPosts();
                             <input type="text" name="username" placeholder="Your Name" required>
                             <textarea name="content" rows="3" placeholder="Share something with the group..." required></textarea>
                             <select name="group" required>
-                                <?php foreach ($_SESSION['user_groups'] as $group): ?>
-                                    <option value="<?= htmlspecialchars($group) ?>"><?= htmlspecialchars($group) ?></option>
-                                <?php endforeach; ?>
+                                <option value="">Select a group</option>
+                                <optgroup label="Cities">
+                                    <?php foreach ($available_groups['cities'] as $city): ?>
+                                        <?php if (in_array($city, $_SESSION['user_groups'])): ?>
+                                            <option value="<?= htmlspecialchars($city) ?>"><?= htmlspecialchars($city) ?></option>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </optgroup>
+                                <optgroup label="Farming">
+                                    <?php foreach ($available_groups['farming'] as $group): ?>
+                                        <?php if (in_array($group, $_SESSION['user_groups'])): ?>
+                                            <option value="<?= htmlspecialchars($group) ?>"><?= htmlspecialchars($group) ?></option>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </optgroup>
+                                <optgroup label="Specialty">
+                                    <?php foreach ($available_groups['specialty'] as $group): ?>
+                                        <?php if (in_array($group, $_SESSION['user_groups'])): ?>
+                                            <option value="<?= htmlspecialchars($group) ?>"><?= htmlspecialchars($group) ?></option>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </optgroup>
                             </select>
                             <button type="submit" name="post_content">Post to Group</button>
                         </form>
@@ -206,7 +210,6 @@ $posts = $post->getPosts();
                 <?php endif; ?>
             </div>
 
-            <!-- Main Content (Right Column) -->
             <div class="main-content">
                 <div class="upload-post">
                     <form method="POST" enctype="multipart/form-data">
@@ -224,72 +227,71 @@ $posts = $post->getPosts();
                 </div>
 
                 <div class="posts">
-                    <?php foreach ($posts as $post): ?>
+                    <?php foreach ($posts as $postItem): ?>
                         <div class="post">
                             <div class="post-header">
                                 <div class="user-info">
-                                    <img src="./harvest_hub_landing_page/assets/default-avatar.png" alt="User avatar" class="avatar">
+                                    <img src="<?= !empty($postItem['user_photo']) ? htmlspecialchars($postItem['user_photo']) : './harvest_hub_landing_page/assets/default-avatar.png' ?>" 
+                                        alt="User avatar" 
+                                        class="avatar">
                                     <div>
-                                        <h3>User</h3>
-                                        <small><?= date('F j \a\t g:i a', strtotime($post['timestamp'])) ?> · <i class="fas fa-globe"></i></small>
+                                        <h3><?= htmlspecialchars($postItem['user_name'] ?? 'Anonymous') ?></h3>
+                                        <small><?= date('F j \a\t g:i a', strtotime($postItem['timestamp'])) ?> · <i class="fas fa-globe"></i></small>
                                     </div>
                                 </div>
                                 <div class="post-actions">
-                                    <a href="./harvest_hub_landing_page/edit_post.php?id=<?= $post['id'] ?>">Edit</a>
-                                    <a href="./harvest_hub_landing_page/delete_post.php?id=<?= $post['id'] ?>">Delete</a>
+                                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $postItem['user_id']): ?>
+                                        <a href="./harvest_hub_landing_page/edit_post.php?id=<?= $postItem['id'] ?>">Edit</a>
+                                        <a href="./harvest_hub_landing_page/delete_post.php?id=<?= $postItem['id'] ?>">Delete</a>
+                                    <?php endif; ?>
                                 </div>
                             </div>
-
                             <div class="post-content">
-                                <p><?= htmlspecialchars($post['message']) ?></p>
-                                <?php if ($post['photo']): ?>
-                                    <img src="<?= htmlspecialchars($post['photo']) ?>" alt="Post image" class="post-image">
+                                <p><?= htmlspecialchars($postItem['message']) ?></p>
+                                <?php if ($postItem['photo']): ?>
+                                    <img src="<?= htmlspecialchars($postItem['photo']) ?>" alt="Post image" class="post-image">
                                 <?php endif; ?>
                             </div>
 
-                            <?php if ($post['for_sale']): ?>
+                            <div class="post-interactions">
+                                <form method="POST" class="like-form">
+                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                    <input type="hidden" name="post_id" value="<?= $postItem['id'] ?>">
+                                    <button type="submit" name="like" class="like-btn <?= $postManager->isLiked($postItem['id'], $_SESSION['user_id']) ? 'liked' : '' ?>">
+                                        <i class="far fa-thumbs-up"></i> Like (<?= $postItem['like_count'] ?>)
+                                    </button>
+                                </form>
+                                <button class="comment-btn" onclick="toggleCommentForm(<?= $postItem['id'] ?>)">
+                                    <i class="far fa-comment"></i> Comment (<?= $postItem['comment_count'] ?>)
+                                </button>
+                            </div>
+
+                            <div id="comment-form-<?= $postItem['id'] ?>" class="comment-form" style="display: none;">
+                                <form method="POST">
+                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                    <input type="hidden" name="post_id" value="<?= $postItem['id'] ?>">
+                                    <input type="text" name="comment_text" placeholder="Write a comment..." required>
+                                    <button type="submit" name="comment">Post Comment</button>
+                                </form>
+                            </div>
+
+                            <div class="comments">
+                                <?php
+                                $comments = $postManager->getComments($postItem['id']);
+                                foreach ($comments as $comment):
+                                ?>
+                                    <div class="comment">
+                                        <strong><?= htmlspecialchars($comment['user_name']) ?>:</strong>
+                                        <?= htmlspecialchars($comment['content']) ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+
+                            <?php if ($postItem['for_sale']): ?>
                                 <div class="buy-section">
                                     <button class="buy-btn">Buy Now</button>
                                 </div>
                             <?php endif; ?>
-
-                            <div class="post-footer">
-                                <div class="interaction-info">
-                                    <span><?= $post['like_count'] ?> likes</span>
-                                    <span><?= $post['comment_count'] ?> comments</span>
-                                </div>
-                                <div class="interaction-buttons">
-                                    <form method="POST">
-                                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                                        <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
-                                        <button type="submit" name="like" class="like-btn <?= $post->isLiked($post['id']) ? 'liked' : '' ?>">
-                                            <i class="far fa-thumbs-up"></i> Like
-                                        </button>
-                                    </form>
-                                    <button class="comment-btn" onclick="toggleCommentForm(<?= $post['id'] ?>)">
-                                        <i class="far fa-comment"></i> Comment
-                                    </button>
-                                </div>
-                                <div id="comment-form-<?= $post['id'] ?>" class="comment-form" style="display: none;">
-                                    <form method="POST">
-                                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                                        <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
-                                        <input type="text" name="comment_text" placeholder="Write a comment..." required>
-                                        <button type="submit" name="comment">Comment</button>
-                                    </form>
-                                </div>
-                                <div class="comments">
-                                    <?php
-                                    $comments = $post->getComments($post['id']);
-                                    foreach ($comments as $comment):
-                                    ?>
-                                        <div class="comment">
-                                            <strong><?= htmlspecialchars($comment['author']) ?>:</strong>
-                                            <?= htmlspecialchars($comment['message']) ?>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -323,3 +325,4 @@ function createGroupButton($group) {
     ";
 }
 ?>
+

@@ -281,6 +281,37 @@ nav a:hover, nav a.active {
     background-color: #d32f2f;
 }
 
+.post-interactions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.post-interactions form {
+    display: inline-block;
+}
+
+.like-btn, .comment-btn {
+    background: none;
+    border: none;
+    color: #65676b;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    display: inline-block;
+}
+
+.like-btn:hover, .comment-btn:hover {
+    background-color: #f0f2f5;
+}
+
+.like-btn.liked {
+    color: #0ac700;
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 10px;
