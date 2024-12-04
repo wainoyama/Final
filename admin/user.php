@@ -6,6 +6,7 @@ class User {
     public function __construct($db) {
         $this->conn = $db;
     }
+
     public function register($name, $email, $password) {
         $query = "INSERT INTO " . $this->table_name . " (name, email, password) VALUES (:name, :email, :password)";
         $stmt = $this->conn->prepare($query);
@@ -14,10 +15,7 @@ class User {
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':password', password_hash($password, PASSWORD_DEFAULT));
 
-        if ($stmt->execute()) {
-            return true;
-        }
-        return false;
+        return $stmt->execute();
     }
 
     public function getAllUsers() {

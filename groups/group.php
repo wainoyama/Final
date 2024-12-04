@@ -1,5 +1,9 @@
 <?php
-require_once 'auth_check.php';
+require_once 'group_db.php';
+
+// Get all groups or search results if search query exists
+$search = isset($_GET['search']) ? $_GET['search'] : '';
+$groups = $search ? searchGroups($search) : getAllGroups();
 ?>
 
 <!DOCTYPE html>
@@ -7,13 +11,14 @@ require_once 'auth_check.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harvest Hub Landing Page</title>
+    <title>Groups - Harvest Hub</title>
     <link rel="stylesheet" href="./css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-    <header>
+        <!-- Header Section -->
+        <header>
             <div class="header-content">
                 <div class="logo">
                     <span>Harvest Hub</span>
@@ -33,44 +38,54 @@ require_once 'auth_check.php';
                 </div>
             </div>
         </header>
-        
+
         <div class="content">
+            <!-- Search Bar -->
             <div class="search-bar">
-                <form action="search.php" method="GET">
-                    <input type="text" name="query" placeholder="Search Harvest Hub...">
+                <form action="group.php" method="GET">
+                    <input type="text" name="search" placeholder="Search Groups..." value="<?php echo htmlspecialchars($search); ?>">
                     <button type="submit"><i class="fas fa-search"></i></button>
                 </form>
             </div>
 
-            <div class="welcome-section">
-                <h1>Welcome to Harvest Hub</h1>
-                
-                <p>Connect with farmers, share your harvest, and explore sustainable agriculture.</p>
+            <!-- Create Group Button -->
+            <?php if (isLoggedIn()): ?>
+            <div style="text-align: right; margin-bottom: 20px;">
+                <a href="create_group.php" class="btn">
+                    <i class="fas fa-plus"></i> Create New Group
+                </a>
+            </div>
+            <?php endif; ?>
+
+            <!-- Groups List -->
+            <div class="feature-boxes">
+                <?php foreach ($groups as $group): ?>
+                <div class="feature-box">
+                    <?php if ($group['group_image']): ?>
+                        <img src="<?php echo htmlspecialchars($group['group_image']); ?>" 
+                             alt="Group Image" 
+                             style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 15px;">
+                    <?php else: ?>
+                        <i class="fas fa-users"></i>
+                    <?php endif; ?>
+                    <h2><?php echo htmlspecialchars($group['group_name']); ?></h2>
+                    <p><?php echo htmlspecialchars($group['description']); ?></p>
+                    <p class="group-meta">
+                        <span><i class="fas fa-user-friends"></i> <?php echo $group['member_count']; ?> members</span>
+                    </p>
+                    <a href="view_group.php?id=<?php echo $group['group_id']; ?>" class="btn">View Group</a>
+                </div>
+                <?php endforeach; ?>
             </div>
 
-            <div class="feature-boxes">
-                <div class="feature-box">
-                    <i class="fas fa-users"></i>
-                    <h2>Community</h2>
-                    <p>Join our thriving community of farmers and enthusiasts.</p>
-                    <a href="community.php" class="btn">Explore Community</a>
-                </div>
-                <div class="feature-box">
-                    <i class="fas fa-shopping-basket"></i>
-                    <h2>About Us</h2>
-                    <p>Learn more about us!
-</p>
-                    <a href="aboutus.php" class="btn">About Us</a>
-                </div>
-                <div class="feature-box">
-                    <i class="fas fa-seedling"></i>
-                    <h2>Resources</h2>
-                    <p>Access farming tips, guides, and sustainable practices.</p>
-                    <a href="resources.php" class="btn">View Resources</a>
-                </div>
+            <?php if (empty($groups)): ?>
+            <div style="text-align: center; padding: 20px;">
+                <p>No groups found. <?php echo $search ? 'Try a different search term.' : 'Be the first to create a group!'; ?></p>
             </div>
+            <?php endif; ?>
         </div>
 
+        <!-- Footer -->
         <footer>
             <div class="footer-content">
                 <div class="footer-section">

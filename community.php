@@ -19,12 +19,6 @@ if (!isset($_SESSION['user_groups'])) {
     $_SESSION['user_groups'] = [];
 }
 
-// Modify the $available_groups array to separate cities
-$available_groups = [
-    'cities' => ['Cavite', 'Batangas', 'Laguna', 'Quezon', 'Rizal'],
-    'farming' => ['Farming Tips'],
-    'specialty' => ['Organic Farmers Network', 'Crop Exchange Hub']
-];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
@@ -94,22 +88,7 @@ usort($posts, function($a, $b) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Harvest Hub Community</title>
     <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/community_additional.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .post {
-            margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 20px;
-        }
-        .post:last-child {
-            border-bottom: none;
-        }
-        .posts {
-            display: flex;
-            flex-direction: column;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -135,81 +114,6 @@ usort($posts, function($a, $b) {
         </header>
         
         <div class="community-layout">
-            <div class="group-section">
-                <h2>Community Groups</h2>
-
-                <div class="group-list">
-                    <h3>CALABARZON Cities</h3>
-                    <?php foreach ($available_groups['cities'] as $city): ?>
-                        <?php echo createGroupButton($city); ?>
-                    <?php endforeach; ?>
-
-                    <h3>Farming</h3>
-                    <?php foreach ($available_groups['farming'] as $group): ?>
-                        <?php echo createGroupButton($group); ?>
-                    <?php endforeach; ?>
-
-                    <h3>Specialty Groups</h3>
-                    <?php foreach ($available_groups['specialty'] as $group): ?>
-                        <?php echo createGroupButton($group); ?>
-                    <?php endforeach; ?>
-                </div>
-
-                <?php if (!empty($_SESSION['user_groups'])): ?>
-                    <div class="group-post-form">
-                        <h3>Post to Group</h3>
-                        <form method="POST">
-                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                            <input type="text" name="username" placeholder="Your Name" required>
-                            <textarea name="content" rows="3" placeholder="Share something with the group..." required></textarea>
-                            <select name="group" required>
-                                <option value="">Select a group</option>
-                                <optgroup label="Cities">
-                                    <?php foreach ($available_groups['cities'] as $city): ?>
-                                        <?php if (in_array($city, $_SESSION['user_groups'])): ?>
-                                            <option value="<?= htmlspecialchars($city) ?>"><?= htmlspecialchars($city) ?></option>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                </optgroup>
-                                <optgroup label="Farming">
-                                    <?php foreach ($available_groups['farming'] as $group): ?>
-                                        <?php if (in_array($group, $_SESSION['user_groups'])): ?>
-                                            <option value="<?= htmlspecialchars($group) ?>"><?= htmlspecialchars($group) ?></option>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                </optgroup>
-                                <optgroup label="Specialty">
-                                    <?php foreach ($available_groups['specialty'] as $group): ?>
-                                        <?php if (in_array($group, $_SESSION['user_groups'])): ?>
-                                            <option value="<?= htmlspecialchars($group) ?>"><?= htmlspecialchars($group) ?></option>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                </optgroup>
-                            </select>
-                            <button type="submit" name="post_content">Post to Group</button>
-                        </form>
-                    </div>
-
-                    <div class="group-posts">
-                        <h3>Recent Group Posts</h3>
-                        <?php foreach ($_SESSION['user_groups'] as $group): ?>
-                            <h4><?= htmlspecialchars($group) ?></h4>
-                            <?php if (!empty($_SESSION['group_posts'][$group])): ?>
-                                <?php foreach (array_reverse($_SESSION['group_posts'][$group]) as $groupPost): ?>
-                                    <div class="post">
-                                        <strong><?php echo htmlspecialchars($groupPost['username']); ?></strong>
-                                        <small><?php echo date('F j, g:i a', strtotime($groupPost['timestamp'])); ?></small>
-                                        <p><?php echo htmlspecialchars($groupPost['content']); ?></p>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <p>No posts yet in this group. Be the first to post!</p>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-
             <div class="main-content">
                 <div class="upload-post">
                     <form method="POST" enctype="multipart/form-data">
@@ -296,8 +200,14 @@ usort($posts, function($a, $b) {
                     <?php endforeach; ?>
                 </div>
             </div>
-        </div>
-    </div>
+
+            <div class="group-section">
+                <h2>Community Groups</h2>
+                <div class="harvest-group-container">
+                    <h2>Harvest Group</h2>
+                    <p>View the groups you are connected to know updates from your group!</p>
+                    <a href="./groups/group.php" class="btn-open-groups">Open groups</a>
+                </div>
 
     <script>
     function toggleCommentForm(postId) {
@@ -307,22 +217,4 @@ usort($posts, function($a, $b) {
     </script>
 </body>
 </html>
-
-<?php
-function createGroupButton($group) {
-    $isJoined = in_array($group, $_SESSION['user_groups']);
-    $buttonText = $isJoined ? 'Leave' : 'Join';
-    $buttonClass = $isJoined ? 'leave-group' : 'join-group';
-    $formAction = $isJoined ? 'leave_group' : 'join_group';
-
-    return "
-    <form method='POST' class='group-button-form'>
-        <input type='hidden' name='csrf_token' value='{$_SESSION['csrf_token']}'>
-        <input type='hidden' name='{$formAction}'>
-        <input type='hidden' name='group' value='" . htmlspecialchars($group) . "'>
-        <button type='submit' class='{$buttonClass}'>{$buttonText} {$group}</button>
-    </form>
-    ";
-}
-?>
 
