@@ -1,12 +1,11 @@
 <?php
-require_once 'db.php';
-require_once 'auth_check.php';
+require_once '../db.php';
+require_once '../auth_check.php';
+require_once './classes/Post.php';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
-
-require_once './harvest_hub_landing_page/classes/Post.php';
 
 $postManager = new Post($conn);
 
@@ -18,7 +17,6 @@ usort($posts, function($a, $b) {
 if (!isset($_SESSION['user_groups'])) {
     $_SESSION['user_groups'] = [];
 }
-
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
@@ -87,7 +85,7 @@ usort($posts, function($a, $b) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Harvest Hub Community</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -98,15 +96,15 @@ usort($posts, function($a, $b) {
                     <span>Harvest Hub</span>
                 </div>
                 <nav>
-                    <a href="index.php"><i class="fas fa-home"></i> Home</a>
+                    <a href="../index.php"><i class="fas fa-home"></i> Home</a>
                     <a href="community.php"><i class="fas fa-users"></i> Community</a>
-                    <a href="./profile_page/profile.php"><i class="fas fa-user"></i> Profile</a>
+                    <a href="../profile_page/profile.php"><i class="fas fa-user"></i> Profile</a>
                 </nav>
                 <div class="auth-buttons">
                     <?php if (isLoggedIn()): ?>
-                        <a href="logout.php" class="btn-logout">Log Out</a>
+                        <a href="../login_register/logout.php" class="btn-logout">Log Out</a>
                     <?php else: ?>
-                        <a href="login.php" class="btn-login">Log In</a>
+                        <a href="./login.php" class="btn-login">Log In</a>
                         <a href="register.php" class="btn-signup">Sign Up</a>
                     <?php endif; ?>
                 </div>
@@ -145,8 +143,8 @@ usort($posts, function($a, $b) {
                                 </div>
                                 <div class="post-actions">
                                     <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $postItem['user_id']): ?>
-                                        <a href="./harvest_hub_landing_page/edit_post.php?id=<?= $postItem['id'] ?>">Edit</a>
-                                        <a href="./harvest_hub_landing_page/delete_post.php?id=<?= $postItem['id'] ?>">Delete</a>
+                                        <a href="edit_post.php?id=<?= $postItem['id'] ?>">Edit</a>
+                                        <a href="delete_post.php?id=<?= $postItem['id'] ?>">Delete</a>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -191,9 +189,17 @@ usort($posts, function($a, $b) {
                                 <?php endforeach; ?>
                             </div>
 
-                            <?php if ($postItem['for_sale']): ?>
+                            <?php if (isset($postItem['for_sale']) && $postItem['for_sale'] && !isset($postItem['sold'])): ?>
                                 <div class="buy-section">
-                                    <button class="buy-btn">Buy Now</button>
+                                    <form method="POST" action="../order_manager/process_order.php">
+                                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                        <input type="hidden" name="post_id" value="<?= $postItem['id'] ?>">
+                                        <button type="submit" class="buy-btn">Buy Now</button>
+                                    </form>
+                                </div>
+                            <?php elseif (isset($postItem['for_sale']) && $postItem['for_sale'] && isset($postItem['sold']) && $postItem['sold']): ?>
+                                <div class="buy-section">
+                                    <button class="buy-btn" disabled>Sold</button>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -209,6 +215,10 @@ usort($posts, function($a, $b) {
                     <a href="./groups/group.php" class="btn-open-groups">Open groups</a>
                 </div>
 
+            </div>
+        </div>
+    </div>
+
     <script>
     function toggleCommentForm(postId) {
         var form = document.getElementById('comment-form-' + postId);
@@ -217,4 +227,3 @@ usort($posts, function($a, $b) {
     </script>
 </body>
 </html>
-

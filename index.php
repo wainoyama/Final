@@ -4,6 +4,7 @@ require_once 'auth_check.php';
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,16 +12,17 @@ require_once 'auth_check.php';
     <link rel="stylesheet" href="./css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+
 <body>
     <div class="container">
-    <header>
+        <header>
             <div class="header-content">
                 <div class="logo">
                     <span>Harvest Hub</span>
                 </div>
                 <nav>
                     <a href="index.php"><i class="fas fa-home"></i> Home</a>
-                    <a href="community.php"><i class="fas fa-users"></i> Community</a>
+                    <a href="./harvest_hub_landing_page/community.php"><i class="fas fa-users"></i> Community</a>
                     <a href="./profile_page/profile.php"><i class="fas fa-user"></i> Profile</a>
                 </nav>
                 <div class="auth-buttons">
@@ -33,7 +35,7 @@ require_once 'auth_check.php';
                 </div>
             </div>
         </header>
-        
+
         <div class="content">
             <div class="search-bar">
                 <form action="search.php" method="GET">
@@ -44,7 +46,7 @@ require_once 'auth_check.php';
 
             <div class="welcome-section">
                 <h1>Welcome to Harvest Hub</h1>
-                
+
                 <p>Connect with farmers, share your harvest, and explore sustainable agriculture.</p>
             </div>
 
@@ -53,14 +55,14 @@ require_once 'auth_check.php';
                     <i class="fas fa-users"></i>
                     <h2>Community</h2>
                     <p>Join our thriving community of farmers and enthusiasts.</p>
-                    <a href="community.php" class="btn">Explore Community</a>
+                    <a href="./harvest_hub_landing_page/community.php" class="btn">Explore Community</a>
                 </div>
                 <div class="feature-box">
                     <i class="fas fa-shopping-basket"></i>
                     <h2>About Us</h2>
                     <p>Learn more about us!
-</p>
-                    <a href="aboutus.php" class="btn">About Us</a>
+                    </p>
+                    <a href="./info/aboutus.php" class="btn">About Us</a>
                 </div>
                 <div class="feature-box">
                     <i class="fas fa-seedling"></i>
@@ -99,4 +101,5 @@ require_once 'auth_check.php';
         </footer>
     </div>
 </body>
+
 </html>

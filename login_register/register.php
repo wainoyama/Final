@@ -1,5 +1,5 @@
 <?php
-include('db.php');
+include('./db.php');
 
 $name = $email = $password = $phone = $location = $profilePicture = '';
 $errors = [];
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Harvest Hub</title>
-    <link rel="stylesheet" href="./css/register.css">
+    <link rel="stylesheet" href="../css/register.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>

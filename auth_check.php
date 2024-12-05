@@ -1,5 +1,4 @@
 <?php
-// auth_check.php
 session_start();
 
 function isLoggedIn() {
@@ -7,7 +6,7 @@ function isLoggedIn() {
 }
 
 if (!isLoggedIn()) {
-    header("Location: login.php");
+    header("Location: ./login_register/login.php");
     exit();
 }
 ?>
