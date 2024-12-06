@@ -38,7 +38,7 @@ require_once 'auth_check.php';
 
         <div class="content">
             <div class="search-bar">
-                <form action="search.php" method="GET">
+                <form action="./Search/searching.php" method="GET">
                     <input type="text" name="query" placeholder="Search Harvest Hub...">
                     <button type="submit"><i class="fas fa-search"></i></button>
                 </form>
@@ -68,7 +68,7 @@ require_once 'auth_check.php';
                     <i class="fas fa-seedling"></i>
                     <h2>Resources</h2>
                     <p>Access farming tips, guides, and sustainable practices.</p>
-                    <a href="resources.php" class="btn">View Resources</a>
+                    <a href="./market/resources.php" class="btn">View Resources</a>
                 </div>
             </div>
         </div>
