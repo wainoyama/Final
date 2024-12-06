@@ -1,5 +1,5 @@
 <?php
-include('db.php');
+include('./db.php');
 
 $name = $email = $password = $phone = $location = $profilePicture = '';
 $errors = [];
@@ -57,43 +57,74 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Harvest Hub</title>
+    <link rel="stylesheet" href="../css/register.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <h2>Register</h2>
+    <div class="container">
+        <div class="content">
+            <div class="auth-form">
+                <h2>Create an Account</h2>
+                
+                <?php if (!empty($errors)): ?>
+                    <div class="error-messages">
+                        <?php foreach ($errors as $error): ?>
+                            <div class="message error"><?php echo htmlspecialchars($error); ?></div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
 
-    <?php if (!empty($errors)): ?>
-        <ul>
-            <?php foreach ($errors as $error): ?>
-                <li><?php echo htmlspecialchars($error); ?></li>
-            <?php endforeach; ?>
-        </ul>
-    <?php endif; ?>
+                <form method="POST" enctype="multipart/form-data" class="form-container">
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($name); ?>" required>
+                    </div>
 
-    <form method="POST" enctype="multipart/form-data">
-        <label for="name">Name:</label>
-        <input type="text" name="name" value="<?php echo htmlspecialchars($name); ?>" required><br><br>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
+                    </div>
 
-        <label for="email">Email:</label>
-        <input type="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required><br><br>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
 
-        <label for="password">Password:</label>
-        <input type="password" name="password" required><br><br>
+                    <div class="form-group">
+                        <label for="phone">Phone Number:</label>
+                        <input type="tel" id="phone" name="phone" value="<?php echo htmlspecialchars($phone); ?>" required>
+                    </div>
 
-        <label for="phone">Phone Number:</label>
-        <input type="text" name="phone" value="<?php echo htmlspecialchars($phone); ?>" required><br><br>
+                    <div class="form-group">
+                        <label for="location">Location:</label>
+                        <select id="location" name="location" required>
+                            <option value="">Select Location</option>
+                            <option value="Cavite">Cavite</option>
+                            <option value="Laguna">Laguna</option>
+                            <option value="Batangas">Batangas</option>
+                            <option value="Quezon">Quezon</option>
+                            <option value="Rizal">Rizal</option>
+                        </select>
+                    </div>
 
-        <label for="location">Location:</label>
-        <input type="text" name="location" value="<?php echo htmlspecialchars($location); ?>" required><br><br>
+                    <div class="form-group">
+                        <label for="profilePicture">Profile Picture:</label>
+                        <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
+                    </div>
 
-        <label for="profilePicture">Profile Picture:</label>
-        <input type="file" name="profilePicture" accept="image/*"><br><br>
+                    <button type="submit" class="btn-primary">Register</button>
+                </form>
 
-        <button type="submit">Register</button>
-    </form>
-
-    <p>Already have an account? <a href="login.php">Login here</a></p>
+                <div class="auth-links">
+                    <p>Already have an account? <a href="login.php">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
