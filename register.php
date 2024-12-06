@@ -11,6 +11,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $phone = $_POST['phone'];
     $location = $_POST['location'];
 
+    if (!preg_match('/[A-Z]/', $password) || 
+        !preg_match('/[0-9].*[0-9].*[0-9]/', $password) || 
+        !preg_match('/[\W_]/', $password)) { 
+        $errors[] = 'Password must include at least one uppercase letter, three numbers, and one special character.';
+    }
+
     if (isset($_FILES['profilePicture']) && $_FILES['profilePicture']['error'] == 0) {
         $profilePicture = 'uploads/' . basename($_FILES['profilePicture']['name']);
         move_uploaded_file($_FILES['profilePicture']['tmp_name'], $profilePicture);
@@ -24,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($result->num_rows > 0) {
         $errors[] = 'An account with this email already exists.';
-    } else {
+    } else if (empty($errors)) {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         $sql = 'INSERT INTO users (name, email, phone, password, location, photo) 
@@ -61,26 +67,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <?php if (!empty($errors)): ?>
         <ul>
             <?php foreach ($errors as $error): ?>
-                <li><?php echo $error; ?></li>
+                <li><?php echo htmlspecialchars($error); ?></li>
             <?php endforeach; ?>
         </ul>
     <?php endif; ?>
 
     <form method="POST" enctype="multipart/form-data">
         <label for="name">Name:</label>
-        <input type="text" name="name" value="<?php echo $name; ?>" required><br><br>
+        <input type="text" name="name" value="<?php echo htmlspecialchars($name); ?>" required><br><br>
 
         <label for="email">Email:</label>
-        <input type="email" name="email" value="<?php echo $email; ?>" required><br><br>
+        <input type="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required><br><br>
 
         <label for="password">Password:</label>
         <input type="password" name="password" required><br><br>
 
         <label for="phone">Phone Number:</label>
-        <input type="text" name="phone" value="<?php echo $phone; ?>" required><br><br>
+        <input type="text" name="phone" value="<?php echo htmlspecialchars($phone); ?>" required><br><br>
 
         <label for="location">Location:</label>
-        <input type="text" name="location" value="<?php echo $location; ?>" required><br><br>
+        <input type="text" name="location" value="<?php echo htmlspecialchars($location); ?>" required><br><br>
 
         <label for="profilePicture">Profile Picture:</label>
         <input type="file" name="profilePicture" accept="image/*"><br><br>
