@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'db.php';
+require_once '../db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user = $result->fetch_assoc()) {
             if (password_verify($password, $user['password'])) {
                 $_SESSION['user_id'] = $user['id'];
-                header("Location: index.php");
+                header("Location: ../index.php");
                 exit();
             } else {
                 $error = "Invalid email or password.";
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Harvest Hub</title>
-    <link rel="stylesheet" href="./css/login.css">
+    <link rel="stylesheet" href="../css/login.css">
 </head>
 <body>
     <div class="container">
