@@ -8,10 +8,11 @@ class Order {
     }
 
     public function getProduct($post_id) {
-        $stmt = $this->pdo->prepare("SELECT * FROM posts WHERE id = ?");
+        $stmt = $this->pdo->prepare("SELECT * FROM products WHERE id = ?");
         $stmt->execute([$post_id]);
-        return $stmt->fetch();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+    
 
     public function createOrder($post_id, $buyer_id, $seller_id, $item_description) {
         $status = 'pending';

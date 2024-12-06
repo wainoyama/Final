@@ -9,9 +9,10 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+
 $order = new Order($pdo);
 
-if (isset($_GET['post_id'])) {
+if (isset($_GET['post_id'])) {  
     $post_id = $_GET['post_id'];
     $product = $order->getProduct($post_id);
 } else {
@@ -20,15 +21,50 @@ if (isset($_GET['post_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $buyer_id = $_SESSION['user_id'];
-    $seller_id = $product['seller_id'];
-    $item_description = $_POST['item_description'];
 
-    if ($order->createOrder($post_id, $buyer_id, $seller_id, $item_description)) {
-        echo "<script>Swal.fire('Order placed!', 'Your order has been placed successfully.', 'success');</script>";
+    if (isset($_GET['post_id'])) {  
+        $post_id = $_GET['post_id'];
+        error_log("Post ID: " . $post_id); // Log the post_id for debugging
+        $product = $order->getProduct($post_id);
+        
+        if (!$product) {
+            die("Product not found. Please ensure the post is marked for sale.");
+        }
     } else {
-        echo "<script>Swal.fire('Error!', 'There was an issue placing your order.', 'error');</script>";
+        die("Post ID not provided.");
     }
+
+    if (isset($_GET['post_id'])) {
+        $post_id = intval($_GET['post_id']); // Ensure the ID is an integer
+        $order = new Order($pdo); // Ensure Order is initialized
+    
+        $product = $order->getProduct($post_id);
+        if (!$product) {
+            die("Product not found. Please ensure the post is marked for sale.");
+        }
+    } else {
+        die("Post ID not provided.");
+    }
+
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die('CSRF token validation failed');
+    }
+
+    $postId = $_POST['post_id'];
+    $buyerId = $_SESSION['user_id'];
+
+    $stmt = $conn->prepare("SELECT user_id FROM posts WHERE id = ?");
+    $stmt->bind_param("i", $postId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $post = $result->fetch_assoc();
+    $sellerId = $post['user_id'];
+
+    $stmt = $conn->prepare("INSERT INTO orders (post_id, buyer_id, seller_id, status, order_date) VALUES (?, ?, ?, 'pending', NOW())");
+    $stmt->bind_param("iii", $postId, $buyerId, $sellerId);
+    $stmt->execute();
+
+    header('Location: order_confirmation.php');
 }
 ?>
 
@@ -41,8 +77,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <h2>Order Product</h2>
-    <p><strong>Product Name:</strong> <?= $product['name'] ?></p>
-    <p><strong>Price:</strong> $<?= $product['price'] ?></p>
+    <p><strong>Product Description:</strong> <?= htmlspecialchars($product['item_description']) ?></p>
+    <p><strong>Price:</strong> $<?= htmlspecialchars($product['price']) ?></p>
     <form method="POST">
         <textarea name="item_description" placeholder="Description" required></textarea><br>
         <button type="submit">Place Order</button>

@@ -6,15 +6,25 @@ class Post {
         $this->conn = $conn;
     }
 
-    public function createPost($message, $photo, $forSale) {
-        $userId = $_SESSION['user_id'];
-        $stmt = $this->conn->prepare("INSERT INTO posts (message, photo, for_sale, user_id) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssii", $message, $photo, $forSale, $userId);
-        
+    public function createPost($message, $photo = null, $forSale = 0, $price = null, $itemDescription = null)
+    {
+        $sql = "INSERT INTO posts (message, photo, for_sale, price, item_description, user_id, timestamp) 
+                VALUES (?, ?, ?, ?, ?, ?, NOW())";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param(
+            "ssidsi",
+            $message,
+            $photo,
+            $forSale,
+            $price,
+            $itemDescription,
+            $_SESSION['user_id']
+        );
         if ($stmt->execute()) {
-            return $this->conn->insert_id;
+            return $stmt->insert_id;
+        } else {
+            return false;
         }
-        return false;
     }
 
     public function getPosts() {
@@ -149,3 +159,5 @@ class Post {
     }
 }
 ?>
+
+

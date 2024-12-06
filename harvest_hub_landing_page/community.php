@@ -28,12 +28,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['message'])) {
         $message = $_POST['message'];
         $for_sale = isset($_POST['for_sale']) ? 1 : 0;
+        $price = isset($_POST['price']) ? $_POST['price'] : null;
+        $item_description = isset($_POST['item_description']) ? $_POST['item_description'] : null;
         $photo = null;
 
         if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
             $fileName = basename($_FILES['photo']['name']);
             $sanitizedFileName = preg_replace("/[^a-zA-Z0-9\._-]/", "_", $fileName);
-            $uploadDir = __DIR__ . '/uploads/';
+            $uploadDir = __DIR__ . 'uploads/';
             if (!file_exists($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
             }
@@ -52,36 +54,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        $newPostId = $postManager->createPost($message, $photo, $for_sale);
+        $newPostId = $postManager->createPost($message, $photo, $for_sale, $price, $item_description);
 
         if ($newPostId) {
             $notificationMessage = isset($_SESSION['user_name']) ? $_SESSION['user_name'] . " created a new post" : " created a new post";
             notif($_SESSION['user_id'], $notificationMessage, $conn);
 
             $posts = $postManager->getPosts();
-
             usort($posts, function ($a, $b) {
                 return strtotime($b['timestamp']) - strtotime($a['timestamp']);
             });
         }
-    } elseif (isset($_POST['like'])) {
-        $postId = $_POST['post_id'];
-        $userId = $_SESSION['user_id'];
-        if ($postManager->isLiked($postId, $userId)) {
-            $postManager->removeLike($postId, $userId);
-        } else {
-            $result = $postManager->addLike($postId, $userId);
-            if ($result === false) {
-                $_SESSION['error_message'] = "Unable to like the post. It may have been deleted.";
-            }
-        }
-    } elseif (isset($_POST['comment'])) {
-        $postId = $_POST['post_id'];
-        $comment = $_POST['comment_text'];
-        $userId = $_SESSION['user_id'];
-        $postManager->addComment($postId, $comment, $userId);
     }
+} elseif (isset($_POST['like'])) {
+    $postId = $_POST['post_id'];
+    $userId = $_SESSION['user_id'];
+    if ($postManager->isLiked($postId, $userId)) {
+        $postManager->removeLike($postId, $userId);
+    } else {
+        $result = $postManager->addLike($postId, $userId);
+        if ($result === false) {
+            $_SESSION['error_message'] = "Unable to like the post. It may have been deleted.";
+        }
+    }
+} elseif (isset($_POST['comment'])) {
+    $postId = $_POST['post_id'];
+    $comment = $_POST['comment_text'];
+    $userId = $_SESSION['user_id'];
+    $postManager->addComment($postId, $comment, $userId);
 }
+
 
 $posts = $postManager->getPosts();
 usort($posts, function ($a, $b) {
@@ -89,6 +91,7 @@ usort($posts, function ($a, $b) {
 });
 
 $notifications = unreadNotif($_SESSION['user_id'], $conn);
+
 
 ?>
 <!DOCTYPE html>
@@ -163,9 +166,12 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
                         <div class="upload-actions">
                             <input type="file" name="photo" accept="image/*">
                             <label for="for_sale" class="for-sale-toggle">
-                                <input type="checkbox" name="for_sale" id="for_sale">
-                                For Sale
+                                <input type="checkbox" name="for_sale" id="for_sale" onchange="toggleForSaleFields()"> For Sale
                             </label>
+                            <div id="for_sale_fields" style="display: none;">
+                                <input type="text" name="price" placeholder="Price" id="price">
+                                <textarea name="item_description" placeholder="Item description" id="item_description"></textarea>
+                            </div>
                             <button type="submit">Post</button>
                         </div>
                     </form>
@@ -236,7 +242,8 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
                                     <form method="POST" action="../order_manager/order_product.php">
                                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                         <input type="hidden" name="post_id" value="<?= $postItem['id'] ?>">
-                                        <button type="submit" class="buy-btn">Buy Now</button>
+                                        <button type="submit">Buy Now</button>
+                                    </form>
                                     </form>
                                 </div>
                             <?php elseif (isset($postItem['for_sale']) && $postItem['for_sale'] && isset($postItem['sold']) && $postItem['sold']): ?>
@@ -264,6 +271,12 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
         function toggleCommentForm(postId) {
             var form = document.getElementById('comment-form-' + postId);
             form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function toggleForSaleFields() {
+            const forSaleFields = document.getElementById('for_sale_fields');
+            const forSaleCheckbox = document.getElementById('for_sale');
+            forSaleFields.style.display = forSaleCheckbox.checked ? 'block' : 'none';
         }
 
         function refreshPosts() {
