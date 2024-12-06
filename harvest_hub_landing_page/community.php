@@ -10,7 +10,7 @@ if (empty($_SESSION['csrf_token'])) {
 $postManager = new Post($conn);
 
 $posts = $postManager->getPosts();
-usort($posts, function($a, $b) {
+usort($posts, function ($a, $b) {
     return strtotime($b['timestamp']) - strtotime($a['timestamp']);
 });
 
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newPostId = $postManager->createPost($message, $photo, $for_sale);
         if ($newPostId) {
             $posts = $postManager->getPosts();
-            usort($posts, function($a, $b) {
+            usort($posts, function ($a, $b) {
                 return strtotime($b['timestamp']) - strtotime($a['timestamp']);
             });
         }
@@ -74,13 +74,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $posts = $postManager->getPosts();
-usort($posts, function($a, $b) {
+usort($posts, function ($a, $b) {
     return strtotime($b['timestamp']) - strtotime($a['timestamp']);
 });
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -88,6 +89,7 @@ usort($posts, function($a, $b) {
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -110,7 +112,14 @@ usort($posts, function($a, $b) {
                 </div>
             </div>
         </header>
-        
+
+        <div class="search-bar">
+            <form action="./Search/searching.php" method="GET">
+                <input type="text" name="query" placeholder="Search">
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+
         <div class="community-layout">
             <div class="main-content">
                 <div class="upload-post">
@@ -133,8 +142,8 @@ usort($posts, function($a, $b) {
                         <div class="post">
                             <div class="post-header">
                                 <div class="user-info">
-                                    <img src="<?= !empty($postItem['user_photo']) ? htmlspecialchars($postItem['user_photo']) : './harvest_hub_landing_page/assets/default-avatar.png' ?>" 
-                                        alt="User avatar" 
+                                    <img src="<?= !empty($postItem['user_photo']) ? htmlspecialchars($postItem['user_photo']) : './harvest_hub_landing_page/assets/default-avatar.png' ?>"
+                                        alt="User avatar"
                                         class="avatar">
                                     <div>
                                         <h3><?= htmlspecialchars($postItem['user_name'] ?? 'Anonymous') ?></h3>
@@ -220,10 +229,11 @@ usort($posts, function($a, $b) {
     </div>
 
     <script>
-    function toggleCommentForm(postId) {
-        var form = document.getElementById('comment-form-' + postId);
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    }
+        function toggleCommentForm(postId) {
+            var form = document.getElementById('comment-form-' + postId);
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
     </script>
 </body>
+
 </html>

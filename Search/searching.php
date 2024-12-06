@@ -52,9 +52,9 @@ $conn->close();
                 <span>Harvest Hub</span>
             </div>
             <nav>
-                <a href="index.php"><i class="fas fa-home"></i> Home</a>
-                <a href="./harvest_hub_landing_page/community.php"><i class="fas fa-users"></i> Community</a>
-                <a href="./profile_page/profile.php"><i class="fas fa-user"></i> Profile</a>
+                <a href="../index.php"><i class="fas fa-home"></i> Home</a>
+                <a href="../harvest_hub_landing_page/community.php"><i class="fas fa-users"></i> Community</a>
+                <a href="../profile_page/profile.php"><i class="fas fa-user"></i> Profile</a>
             </nav>
         </div>
     </header>

@@ -27,10 +27,10 @@ require_once 'auth_check.php';
                 </nav>
                 <div class="auth-buttons">
                     <?php if (isLoggedIn()): ?>
-                        <a href="logout.php" class="btn-logout">Log Out</a>
+                        <a href="./login_register/logout.php" class="btn-logout">Log Out</a>
                     <?php else: ?>
-                        <a href="login.php" class="btn-login">Log In</a>
-                        <a href="register.php" class="btn-signup">Sign Up</a>
+                        <a href="./login_register/login.php" class="btn-login">Log In</a>
+                        <a href="./login_register/register.php" class="btn-signup">Sign Up</a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -68,7 +68,7 @@ require_once 'auth_check.php';
                     <i class="fas fa-seedling"></i>
                     <h2>Resources</h2>
                     <p>Access farming tips, guides, and sustainable practices.</p>
-                    <a href="./market/resources.php" class="btn">View Resources</a>
+                    <a href="./market/agriculture.php" class="btn">View Resources</a>
                 </div>
             </div>
         </div>
