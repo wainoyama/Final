@@ -61,15 +61,36 @@ if (isset($_FILES['profile_picture'])) {
 
     if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
         $photo_path = "uploads/" . basename($_FILES["profile_picture"]["name"]);
-        $update_photo_sql = "UPDATE users SET photo = ? WHERE id = ?";
-        $update_photo_stmt = $conn->prepare($update_photo_sql);
-        $update_photo_stmt->bind_param("si", $photo_path, $user_id);
+        
+        // Start transaction to ensure both updates succeed or fail together
+        $conn->begin_transaction();
+        
+        try {
+            // Update user's profile photo
+            $update_photo_sql = "UPDATE users SET photo = ? WHERE id = ?";
+            $update_photo_stmt = $conn->prepare($update_photo_sql);
+            $update_photo_stmt->bind_param("si", $photo_path, $user_id);
+            $update_photo_stmt->execute();
 
-        if ($update_photo_stmt->execute()) {
+            // Update all posts by this user to reflect the new photo
+            $update_posts_sql = "UPDATE posts p 
+                               JOIN users u ON p.user_id = u.id 
+                               SET p.user_photo = u.photo 
+                               WHERE p.user_id = ?";
+            $update_posts_stmt = $conn->prepare($update_posts_sql);
+            $update_posts_stmt->bind_param("i", $user_id);
+            $update_posts_stmt->execute();
+
+            // If both queries succeed, commit the transaction
+            $conn->commit();
+            
             $success_message = "Profile picture updated successfully!";
             $user['photo'] = $photo_path;
-        } else {
-            $error_message = "Error updating profile picture in database.";
+            
+        } catch (Exception $e) {
+            // If any query fails, roll back the transaction
+            $conn->rollback();
+            $error_message = "Error updating profile picture: " . $e->getMessage();
         }
     } else {
         $error_message = "Error uploading your file.";

@@ -6,6 +6,7 @@ class Post {
         $this->db = $db;
     }
 
+
     public function createPost($message, $photo, $forSale) {
         $userId = $_SESSION['user_id'];
         $stmt = $this->db->prepare("INSERT INTO posts (message, photo, for_sale, user_id) VALUES (?, ?, ?, ?)");
@@ -20,7 +21,7 @@ class Post {
     public function getPosts() {
         $result = $this->db->query("SELECT posts.*, 
                                 users.name as user_name, 
-                                users.photo as user_photo, 
+                                users.photo as user_photo, /* Get the latest photo from users table */
                                 (SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.id) as like_count, 
                                 (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) as comment_count 
                                 FROM posts 

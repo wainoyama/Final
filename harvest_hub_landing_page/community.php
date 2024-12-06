@@ -31,12 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
             $fileName = basename($_FILES['photo']['name']);
             $sanitizedFileName = preg_replace("/[^a-zA-Z0-9\._-]/", "_", $fileName);
-            $uploadDir = __DIR__ . '/harvest_hub_landing_page/uploads/';
+            $uploadDir = __DIR__ . '/uploads/';
             if (!file_exists($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
             }
             $uploadFile = $uploadDir . $sanitizedFileName;
-            $photoUrl = '/harvest_hub_landing_page/uploads/' . $sanitizedFileName;
+            $photoUrl = 'uploads/' . $sanitizedFileName;
             $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
             $fileType = $_FILES['photo']['type'];
 
@@ -104,7 +104,7 @@ usort($posts, function ($a, $b) {
                 </nav>
                 <div class="auth-buttons">
                     <?php if (isLoggedIn()): ?>
-                        <a href="../login_register/logout.php" class="btn-logout">Log Out</a>
+                        <a href="logout.php" class="btn-logout">Log Out</a>
                     <?php else: ?>
                         <a href="./login.php" class="btn-login">Log In</a>
                         <a href="register.php" class="btn-signup">Sign Up</a>
@@ -113,14 +113,18 @@ usort($posts, function ($a, $b) {
             </div>
         </header>
 
-        <div class="search-bar">
-            <form action="./Search/searching.php" method="GET">
-                <input type="text" name="query" placeholder="Search">
-                <button type="submit"><i class="fas fa-search"></i></button>
-            </form>
-        </div>
-
         <div class="community-layout">
+            <div class="left-side">
+                <div class="search-bar">
+                    <form action="searching.php" method="GET">
+                        <input type="text" name="query" placeholder="Search">
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+                <div class="notifs">
+                    <h2>Notifications</h2>
+                </div>
+            </div>
             <div class="main-content">
                 <div class="upload-post">
                     <form method="POST" enctype="multipart/form-data">
@@ -142,7 +146,7 @@ usort($posts, function ($a, $b) {
                         <div class="post">
                             <div class="post-header">
                                 <div class="user-info">
-                                    <img src="<?= !empty($postItem['user_photo']) ? htmlspecialchars($postItem['user_photo']) : './harvest_hub_landing_page/assets/default-avatar.png' ?>"
+                                    <img src="<?= !empty($postItem['user_photo']) ? htmlspecialchars($postItem['user_photo']) : 'uploads/default-avatar.png' ?>"
                                         alt="User avatar"
                                         class="avatar">
                                     <div>
@@ -200,7 +204,7 @@ usort($posts, function ($a, $b) {
 
                             <?php if (isset($postItem['for_sale']) && $postItem['for_sale'] && !isset($postItem['sold'])): ?>
                                 <div class="buy-section">
-                                    <form method="POST" action="../order_manager/process_order.php">
+                                    <form method="POST" action="process_order.php">
                                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                         <input type="hidden" name="post_id" value="<?= $postItem['id'] ?>">
                                         <button type="submit" class="buy-btn">Buy Now</button>
@@ -221,7 +225,7 @@ usort($posts, function ($a, $b) {
                 <div class="harvest-group-container">
                     <h2>Harvest Group</h2>
                     <p>View the groups you are connected to know updates from your group!</p>
-                    <a href="./groups/group.php" class="btn-open-groups">Open groups</a>
+                    <a href="group.php" class="btn-open-groups">Open groups</a>
                 </div>
 
             </div>
@@ -237,3 +241,4 @@ usort($posts, function ($a, $b) {
 </body>
 
 </html>
+
