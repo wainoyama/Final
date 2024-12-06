@@ -26,8 +26,8 @@ if (isset($_POST['submit'])) {
     <link rel="stylesheet" href="../css/admin_login.css">
 </head>
 <body>
-    <h2>Admin Login</h2>
     <div class="form-container">
+    <h2>Admin Login</h2>
         <?php if ($error_message != "") { echo "<p class='error'>$error_message</p>"; } ?>
         <form action="admin_login.php" method="POST">
             <label for="username">Username:</label>

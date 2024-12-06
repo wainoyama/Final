@@ -1,55 +1,69 @@
 <?php
-require_once 'config.php';
+// order_status.php
+session_start();
+include 'config.php';
+include 'Order.php';
 
-class OrderStatus {
-    private $db;
-
-    public function __construct() {
-        $this->db = Database::getInstance()->getConnection();
-    }
-
-    public function getStatus($orderId) {
-        $sql = "SELECT * FROM orders WHERE id = :id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $orderId]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function updateStatus($orderId, $status) {
-        $sql = "UPDATE orders SET status = :status WHERE id = :id";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([':status' => $status, ':id' => $orderId]);
-    }
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit();
 }
 
-include 'header.php';
+$order = new Order($pdo);
 
-$orderStatus = new OrderStatus();
-
-if (isset($_GET['orderId'])) {
-    $orderId = $_GET['orderId'];
-    $status = $orderStatus->getStatus($orderId);
-
-    if ($status) {
-        echo "<h1>Order Status</h1>";
-        echo "<p>Order ID: " . htmlspecialchars($orderId) . "</p>";
-        echo "<p>Status: " . htmlspecialchars($status['status'] ?? 'N/A') . "</p>";
-        echo "<p>Location: " . htmlspecialchars($status['location'] ?? 'N/A') . "</p>";
-        echo "<p>Contact: " . htmlspecialchars($status['contact'] ?? 'N/A') . "</p>";
-        echo "<p>Pickup Date: " . htmlspecialchars($status['pickup_date'] ?? 'N/A') . "</p>";
-        echo "<p>Pickup Time: " . htmlspecialchars($status['pickup_time'] ?? 'N/A') . "</p>";
-        echo "<p>Created At: " . htmlspecialchars($status['created_at'] ?? 'N/A') . "</p>";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $order_id = $_POST['order_id'];
+    $status = $_POST['status'];
+    if ($order->updateOrderStatus($order_id, $status)) {
+        echo "<script>Swal.fire('Success!', 'Order status updated.', 'success');</script>";
     } else {
-        echo "<p>Order not found.</p>";
+        echo "<script>Swal.fire('Error!', 'Failed to update order status.', 'error');</script>";
     }
-} else {
-    echo "<h2>Track Your Order</h2>";
-    echo "<form method='get' action=''>";
-    echo "<label for='orderId'>Enter Order ID:</label>";
-    echo "<input type='number' name='orderId' id='orderId' required>";
-    echo "<input type='submit' value='Check Status'>";
-    echo "</form>";
 }
 
+$orders = $order->getUserOrders($_SESSION['user_id']);
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Status</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+<body>
+    <h2>Your Orders</h2>
+    <table id="orders_table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($orders as $order) : ?>
+                <tr>
+                    <td><?= $order['item_description'] ?></td>
+                    <td><?= $order['status'] ?></td>
+                    <td>
+                        <?php if ($order['status'] == 'pending' && $order['seller_id'] == $_SESSION['user_id']) : ?>
+                            <form method="POST">
+                                <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
+                                <button type="submit" name="status" value="completed">Approve</button>
+                                <button type="submit" name="status" value="cancelled">Reject</button>
+                            </form>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+
+    <script>
+        $(document).ready(function() {
+            $('#orders_table').DataTable();
+        });
+    </script>
+</body>
+</html>

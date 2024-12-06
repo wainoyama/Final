@@ -1,54 +1,32 @@
 <?php
-require_once 'config.php';
+// Order.php
+class Order {
+    private $pdo;
 
-class OrderStatus {
-    private $db;
-
-    public function __construct() {
-        $this->db = Database::getInstance()->getConnection();
+    public function __construct($pdo) {
+        $this->pdo = $pdo;
     }
 
-    public function getStatus($orderId) {
-        $sql = "SELECT * FROM orders WHERE id = :id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $orderId]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+    public function getProduct($post_id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM posts WHERE id = ?");
+        $stmt->execute([$post_id]);
+        return $stmt->fetch();
     }
 
-    public function updateStatus($orderId, $status) {
-        $sql = "UPDATE orders SET status = :status WHERE id = :id";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([':status' => $status, ':id' => $orderId]);
+    public function createOrder($post_id, $buyer_id, $seller_id, $item_description) {
+        $status = 'pending';
+        $stmt = $this->pdo->prepare("INSERT INTO orders (post_id, buyer_id, seller_id, item_description, status) VALUES (?, ?, ?, ?, ?)");
+        return $stmt->execute([$post_id, $buyer_id, $seller_id, $item_description, $status]);
+    }
+
+    public function getUserOrders($user_id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM orders WHERE buyer_id = ? OR seller_id = ?");
+        $stmt->execute([$user_id, $user_id]);
+        return $stmt->fetchAll();
+    }
+
+    public function updateOrderStatus($order_id, $status) {
+        $stmt = $this->pdo->prepare("UPDATE orders SET status = ? WHERE id = ?");
+        return $stmt->execute([$status, $order_id]);
     }
 }
-
-include 'header.php';
-
-$orderStatus = new OrderStatus();
-
-if (isset($_GET['orderId'])) {
-    $orderId = $_GET['orderId'];
-    $status = $orderStatus->getStatus($orderId);
-
-    if ($status) {
-        echo "<h1>Order Status</h1>";
-        echo "<p>Order ID: " . htmlspecialchars($orderId) . "</p>";
-        echo "<p>Status: " . htmlspecialchars($status['status']) . "</p>";
-        echo "<p>Location: " . htmlspecialchars($status['location']) . "</p>";
-        echo "<p>Contact: " . htmlspecialchars($status['contact']) . "</p>";
-        echo "<p>Pickup Date: " . htmlspecialchars($status['pickup_date']) . "</p>";
-        echo "<p>Pickup Time: " . htmlspecialchars($status['pickup_time']) . "</p>";
-    } else {
-        echo "<p>Order not found.</p>";
-    }
-} else {
-    echo "<h2>Track Your Order</h2>";
-    echo "<form method='get' action=''>";
-    echo "<label for='orderId'>Enter Order ID:</label>";
-    echo "<input type='number' name='orderId' id='orderId' required>";
-    echo "<input type='submit' value='Check Status'>";
-    echo "</form>";
-}
-
-?>
-

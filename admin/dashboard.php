@@ -28,7 +28,6 @@
             </header>
             <section>
                 <h2>Dashboard Overview</h2>
-                <!-- Add your dashboard content here -->
             </section>
         </main>
     </div>

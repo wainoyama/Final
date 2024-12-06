@@ -2,6 +2,8 @@
 require_once '../db.php';
 require_once '../auth_check.php';
 require_once './classes/Post.php';
+require_once '../notifications/notif.php';
+require_once '../notifications/db_notif.php';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -51,8 +53,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $newPostId = $postManager->createPost($message, $photo, $for_sale);
+
         if ($newPostId) {
+            $notificationMessage = isset($_SESSION['user_name']) ? $_SESSION['user_name'] . " created a new post" : " created a new post";
+            notif($_SESSION['user_id'], $notificationMessage, $conn);
+
             $posts = $postManager->getPosts();
+
             usort($posts, function ($a, $b) {
                 return strtotime($b['timestamp']) - strtotime($a['timestamp']);
             });
@@ -63,7 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($postManager->isLiked($postId, $userId)) {
             $postManager->removeLike($postId, $userId);
         } else {
-            $postManager->addLike($postId, $userId);
+            $result = $postManager->addLike($postId, $userId);
+            if ($result === false) {
+                $_SESSION['error_message'] = "Unable to like the post. It may have been deleted.";
+            }
         }
     } elseif (isset($_POST['comment'])) {
         $postId = $_POST['post_id'];
@@ -77,8 +87,10 @@ $posts = $postManager->getPosts();
 usort($posts, function ($a, $b) {
     return strtotime($b['timestamp']) - strtotime($a['timestamp']);
 });
-?>
 
+$notifications = unreadNotif($_SESSION['user_id'], $conn);
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -91,6 +103,12 @@ usort($posts, function ($a, $b) {
 </head>
 
 <body>
+    <?php
+    if (isset($_SESSION['error_message'])) {
+        echo '<div class="error-message">' . htmlspecialchars($_SESSION['error_message']) . '</div>';
+        unset($_SESSION['error_message']);
+    }
+    ?>
     <div class="container">
         <header>
             <div class="header-content">
@@ -123,6 +141,18 @@ usort($posts, function ($a, $b) {
                 </div>
                 <div class="notifs">
                     <h2>Notifications</h2>
+                    <?php if (!empty($notifications)): ?>
+                        <ul>
+                            <?php foreach ($notifications as $notif): ?>
+                                <li>
+                                    <span><?= htmlspecialchars($notif['message']) ?></span>
+                                    <small><?= date('F j, Y g:i a', strtotime($notif['created_at'])) ?></small>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php else: ?>
+                        <p>No notifications yet.</p>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="main-content">
@@ -140,8 +170,7 @@ usort($posts, function ($a, $b) {
                         </div>
                     </form>
                 </div>
-
-                <div class="posts">
+                <div class="posts" id="posts">
                     <?php foreach ($posts as $postItem): ?>
                         <div class="post">
                             <div class="post-header">
@@ -204,7 +233,7 @@ usort($posts, function ($a, $b) {
 
                             <?php if (isset($postItem['for_sale']) && $postItem['for_sale'] && !isset($postItem['sold'])): ?>
                                 <div class="buy-section">
-                                    <form method="POST" action="process_order.php">
+                                    <form method="POST" action="../order_manager/order_product.php">
                                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                         <input type="hidden" name="post_id" value="<?= $postItem['id'] ?>">
                                         <button type="submit" class="buy-btn">Buy Now</button>
@@ -227,7 +256,6 @@ usort($posts, function ($a, $b) {
                     <p>View the groups you are connected to know updates from your group!</p>
                     <a href="group.php" class="btn-open-groups">Open groups</a>
                 </div>
-
             </div>
         </div>
     </div>
@@ -237,8 +265,20 @@ usort($posts, function ($a, $b) {
             var form = document.getElementById('comment-form-' + postId);
             form.style.display = form.style.display === 'none' ? 'block' : 'none';
         }
+
+        function refreshPosts() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'fetch_posts.php', true);
+            xhr.onload = function() {
+                if (xhr.status == 200) {
+                    document.getElementById('posts').innerHTML = xhr.responseText;
+                }
+            };
+            xhr.send();
+        }
+
+        setInterval(refreshPosts, 5000);
     </script>
 </body>
 
 </html>
-
