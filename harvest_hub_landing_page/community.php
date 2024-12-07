@@ -4,6 +4,7 @@ require_once '../auth_check.php';
 require_once './classes/Post.php';
 require_once '../notifications/notif.php';
 require_once '../notifications/db_notif.php';
+require_once 'upload_handler.php';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -20,6 +21,8 @@ if (!isset($_SESSION['user_groups'])) {
     $_SESSION['user_groups'] = [];
 }
 
+$notifications = unreadNotif($_SESSION['user_id'], $conn);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         die('CSRF token validation failed');
@@ -28,62 +31,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['message'])) {
         $message = $_POST['message'];
         $for_sale = isset($_POST['for_sale']) ? 1 : 0;
-        $price = isset($_POST['price']) ? $_POST['price'] : null;
+        $price = isset($_POST['price']) ? floatval($_POST['price']) : null;
         $item_description = isset($_POST['item_description']) ? $_POST['item_description'] : null;
         $photo = null;
 
         if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-            $fileName = basename($_FILES['photo']['name']);
-            $sanitizedFileName = preg_replace("/[^a-zA-Z0-9\._-]/", "_", $fileName);
-            $uploadDir = __DIR__ . 'uploads/';
-            if (!file_exists($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
+            $photoUrl = uploadPhoto($_FILES['photo']);
+            if (strpos($photoUrl, 'Error') === false) {
+                $photo = $photoUrl;
+            } else {
+                $_SESSION['error_message'] = $photoUrl;
             }
-            $uploadFile = $uploadDir . $sanitizedFileName;
-            $photoUrl = 'uploads/' . $sanitizedFileName;
-            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-            $fileType = $_FILES['photo']['type'];
+        }
 
-            if (in_array($fileType, $allowedTypes)) {
-                $maxFileSize = 40 * 1024 * 1024;
-                if ($_FILES['photo']['size'] <= $maxFileSize) {
-                    if (move_uploaded_file($_FILES['photo']['tmp_name'], $uploadFile)) {
-                        $photo = $photoUrl;
-                    }
-                }
-            }
+        if (isset($_SESSION['new_profile_picture'])) {
+            $postManager = new Post($conn);
+            $postManager->updateUserPhotoInPosts($_SESSION['user_id'], $_SESSION['new_profile_picture']);
+            unset($_SESSION['new_profile_picture']);
         }
 
         $newPostId = $postManager->createPost($message, $photo, $for_sale, $price, $item_description);
 
         if ($newPostId) {
-            $notificationMessage = isset($_SESSION['user_name']) ? $_SESSION['user_name'] . " created a new post" : " created a new post";
-            notif($_SESSION['user_id'], $notificationMessage, $conn);
+            $notificationMessage = "created a new post";
+            $allUsersSql = "SELECT id FROM users WHERE id != ?";
+            $allUsersStmt = $conn->prepare($allUsersSql);
+            $allUsersStmt->bind_param("i", $_SESSION['user_id']);
+            $allUsersStmt->execute();
+            $allUsersResult = $allUsersStmt->get_result();
+            while ($user = $allUsersResult->fetch_assoc()) {
+                notif($user['id'], $notificationMessage, $conn);
+            }
 
             $posts = $postManager->getPosts();
             usort($posts, function ($a, $b) {
                 return strtotime($b['timestamp']) - strtotime($a['timestamp']);
             });
         }
-    }
-} elseif (isset($_POST['like'])) {
-    $postId = $_POST['post_id'];
-    $userId = $_SESSION['user_id'];
-    if ($postManager->isLiked($postId, $userId)) {
-        $postManager->removeLike($postId, $userId);
-    } else {
-        $result = $postManager->addLike($postId, $userId);
-        if ($result === false) {
-            $_SESSION['error_message'] = "Unable to like the post. It may have been deleted.";
+    } elseif (isset($_POST['like'])) {
+        $postId = $_POST['post_id'];
+        $userId = $_SESSION['user_id'];
+        if ($postManager->isLiked($postId, $userId)) {
+            $result = $postManager->removeLike($postId, $userId);
+        } else {
+            $result = $postManager->addLike($postId, $userId);
         }
+        if ($result === false) {
+            $_SESSION['error_message'] = "Unable to process like. The post may have been deleted.";
+        }
+        header("Location: community.php");
+        exit();
+    } elseif (isset($_POST['comment'])) {
+        $postId = $_POST['post_id'];
+        $comment = $_POST['comment_text'];
+        $userId = $_SESSION['user_id'];
+        $postManager->addComment($postId, $comment, $userId);
     }
-} elseif (isset($_POST['comment'])) {
-    $postId = $_POST['post_id'];
-    $comment = $_POST['comment_text'];
-    $userId = $_SESSION['user_id'];
-    $postManager->addComment($postId, $comment, $userId);
 }
-
 
 $posts = $postManager->getPosts();
 usort($posts, function ($a, $b) {
@@ -91,7 +95,6 @@ usort($posts, function ($a, $b) {
 });
 
 $notifications = unreadNotif($_SESSION['user_id'], $conn);
-
 
 ?>
 <!DOCTYPE html>
@@ -103,6 +106,7 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
     <title>Harvest Hub Community</title>
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -137,10 +141,11 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
         <div class="community-layout">
             <div class="left-side">
                 <div class="search-bar">
-                    <form action="searching.php" method="GET">
-                        <input type="text" name="query" placeholder="Search">
+                    <form action="search_user.php" method="GET">
+                        <input type="text" name="search" id="search-input" placeholder="Search users..." />
                         <button type="submit"><i class="fas fa-search"></i></button>
                     </form>
+                    <div id="search-results"></div>
                 </div>
                 <div class="notifs">
                     <h2>Notifications</h2>
@@ -169,7 +174,7 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
                                 <input type="checkbox" name="for_sale" id="for_sale" onchange="toggleForSaleFields()"> For Sale
                             </label>
                             <div id="for_sale_fields" style="display: none;">
-                                <input type="text" name="price" placeholder="Price" id="price">
+                                <input type="number" step="0.01" name="price" placeholder="Price" id="price">
                                 <textarea name="item_description" placeholder="Item description" id="item_description"></textarea>
                             </div>
                             <button type="submit">Post</button>
@@ -200,6 +205,13 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
                                 <p><?= htmlspecialchars($postItem['message']) ?></p>
                                 <?php if ($postItem['photo']): ?>
                                     <img src="<?= htmlspecialchars($postItem['photo']) ?>" alt="Post image" class="post-image">
+                                <?php endif; ?>
+                                <?php if ($postItem['for_sale']): ?>
+                                    <div class="for-sale-info">
+                                        <p><strong>Price:</strong> $<?= number_format($postItem['price'], 2) ?></p>
+                                        <p><strong>Description:</strong> <?= htmlspecialchars($postItem['item_description']) ?></p>
+                                        <p><strong>Status:</strong> <?= ucfirst($postItem['order_status']) ?></p>
+                                    </div>
                                 <?php endif; ?>
                             </div>
 
@@ -237,16 +249,15 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
                                 <?php endforeach; ?>
                             </div>
 
-                            <?php if (isset($postItem['for_sale']) && $postItem['for_sale'] && !isset($postItem['sold'])): ?>
+                            <?php if ($postItem['for_sale'] && $postItem['order_status'] === 'pending' && $postItem['user_id'] != $_SESSION['user_id']): ?>
                                 <div class="buy-section">
                                     <form method="POST" action="../order_manager/order_product.php">
                                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                         <input type="hidden" name="post_id" value="<?= $postItem['id'] ?>">
-                                        <button type="submit">Buy Now</button>
-                                    </form>
+                                        <button type="submit" class="buy-btn">Buy Now</button>
                                     </form>
                                 </div>
-                            <?php elseif (isset($postItem['for_sale']) && $postItem['for_sale'] && isset($postItem['sold']) && $postItem['sold']): ?>
+                            <?php elseif ($postItem['for_sale'] && $postItem['order_status'] === 'sold'): ?>
                                 <div class="buy-section">
                                     <button class="buy-btn" disabled>Sold</button>
                                 </div>
@@ -267,7 +278,37 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        <?php if (isset($_SESSION['success_message'])): ?>
+            Swal.fire({
+                title: 'Success!',
+                text: '<?php echo $_SESSION['success_message']; ?>',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+            <?php unset($_SESSION['success_message']); ?>
+        <?php endif; ?>
+        $(document).ready(function() {
+            $('#search-input').on('input', function() {
+                var searchTerm = $(this).val();
+                if (searchTerm.length >= 3) {
+                    $.ajax({
+                        url: 'search_user.php',
+                        method: 'GET',
+                        data: {
+                            search: searchTerm
+                        },
+                        success: function(response) {
+                            $('#search-results').html(response);
+                        }
+                    });
+                } else {
+                    $('#search-results').empty();
+                }
+            });
+        });
+
         function toggleCommentForm(postId) {
             var form = document.getElementById('comment-form-' + postId);
             form.style.display = form.style.display === 'none' ? 'block' : 'none';
@@ -284,14 +325,74 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
             xhr.open('GET', 'fetch_posts.php', true);
             xhr.onload = function() {
                 if (xhr.status == 200) {
-                    document.getElementById('posts').innerHTML = xhr.responseText;
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        document.getElementById('posts').innerHTML = response.html;
+                        if (response.message) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: response.message,
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    } else {
+                        console.error('Error refreshing posts:', response.message);
+                    }
                 }
             };
             xhr.send();
         }
 
         setInterval(refreshPosts, 5000);
+
+        function confirmPurchase(postId) {
+            return new Promise((resolve) => {
+                Swal.fire({
+                    title: 'Confirm Purchase',
+                    text: 'Are you sure you want to buy this item?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, buy it!',
+                    cancelButtonText: 'No, cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.querySelector(`form[action="../order_manager/order_product.php"] input[name="post_id"][value="${postId}"]`)
+                            .closest('form')
+                            .submit();
+                    }
+                    resolve(false);
+                });
+            });
+        }
+
+        function markNotificationAsRead(notificationId) {
+            fetch('mark_notification_read.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'notification_id=' + notificationId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the notification from the list
+                    document.querySelector(`[data-notification-id="${notificationId}"]`).remove();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Add click event listeners to all notification items
+        document.querySelectorAll('.notification-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const notificationId = this.getAttribute('data-notification-id');
+                markNotificationAsRead(notificationId);
+            });
+        });
     </script>
 </body>
 
 </html>
+

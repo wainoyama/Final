@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_FILES['photo'])) {
         $photo = uploadPhoto($_FILES['photo']);
         
-        if (strpos($photo, '/harvest_hub_landing_page/uploads/') === false) {
+        if (strpos($photo, 'uploads/') === false) {
             echo $photo;
             exit();
         }

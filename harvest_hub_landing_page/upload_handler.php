@@ -1,7 +1,9 @@
 <?php
-
 function uploadPhoto($file) {
-    $uploadDir = __DIR__ . '/uploads/'; 
+    $uploadDir = __DIR__ . 'harvest_hub_landing_page/uploads/';
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
     $uploadFile = $uploadDir . basename($file['name']);
     
     if ($file['error'] !== UPLOAD_ERR_OK) {
@@ -17,7 +19,7 @@ function uploadPhoto($file) {
     }
 
     if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
-        return $uploadFile;
+        return 'harvest_hub_landing_page/uploads/' . basename($file['name']);
     } else {
         return "Error uploading file.";
     }

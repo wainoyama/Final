@@ -8,16 +8,29 @@ class Order {
     }
 
     public function getProduct($post_id) {
-        $stmt = $this->pdo->prepare("SELECT * FROM products WHERE id = ?");
+        $stmt = $this->pdo->prepare("SELECT * FROM posts WHERE id = ? AND for_sale = 1");
         $stmt->execute([$post_id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
 
     public function createOrder($post_id, $buyer_id, $seller_id, $item_description) {
-        $status = 'pending';
-        $stmt = $this->pdo->prepare("INSERT INTO orders (post_id, buyer_id, seller_id, item_description, status) VALUES (?, ?, ?, ?, ?)");
-        return $stmt->execute([$post_id, $buyer_id, $seller_id, $item_description, $status]);
+        $this->pdo->beginTransaction();
+        try {
+            $stmt = $this->pdo->prepare("INSERT INTO orders (post_id, buyer_id, seller_id, item_description, status, created_at) 
+                                         VALUES (?, ?, ?, ?, 'pending', NOW())");
+            $stmt->execute([$post_id, $buyer_id, $seller_id, $item_description]);
+    
+            $stmt = $this->pdo->prepare("UPDATE posts SET order_status = 'sold' WHERE id = ?");
+            $stmt->execute([$post_id]);
+    
+            $this->pdo->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            error_log("Order creation failed: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function getUserOrders($user_id) {

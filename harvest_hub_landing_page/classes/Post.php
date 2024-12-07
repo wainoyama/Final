@@ -4,21 +4,40 @@ class Post {
 
     public function __construct($conn) {
         $this->conn = $conn;
+        $this->ensureUserPhotoColumn();
+    }
+
+    private function ensureUserPhotoColumn() {
+        $result = $this->conn->query("SHOW COLUMNS FROM posts LIKE 'user_photo'");
+        if ($result->num_rows == 0) {
+            $this->conn->query("ALTER TABLE posts ADD COLUMN user_photo VARCHAR(255) AFTER user_id");
+        }
     }
 
     public function createPost($message, $photo = null, $forSale = 0, $price = null, $itemDescription = null)
     {
-        $sql = "INSERT INTO posts (message, photo, for_sale, price, item_description, user_id, timestamp) 
-                VALUES (?, ?, ?, ?, ?, ?, NOW())";
+        $sql = "INSERT INTO posts (message, photo, for_sale, price, item_description, user_id, user_photo, timestamp) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
         $stmt = $this->conn->prepare($sql);
+        $photoPath = $photo ? '../uploads/' . basename($photo) : null;
+    
+        // Get the user's current photo
+        $userPhotoSql = "SELECT photo FROM users WHERE id = ?";
+        $userPhotoStmt = $this->conn->prepare($userPhotoSql);
+        $userPhotoStmt->bind_param("i", $_SESSION['user_id']);
+        $userPhotoStmt->execute();
+        $userPhotoResult = $userPhotoStmt->get_result();
+        $userPhoto = $userPhotoResult->fetch_assoc()['photo'];
+    
         $stmt->bind_param(
-            "ssidsi",
+            "ssidsss",
             $message,
-            $photo,
+            $photoPath,
             $forSale,
             $price,
             $itemDescription,
-            $_SESSION['user_id']
+            $_SESSION['user_id'],
+            $userPhoto
         );
         if ($stmt->execute()) {
             return $stmt->insert_id;
@@ -46,7 +65,9 @@ class Post {
     }
 
     public function getPostById($id) {
-        $stmt = $this->conn->prepare("SELECT posts.*, users.name as user_name, users.photo as user_photo, 
+        $stmt = $this->conn->prepare("SELECT posts.*, 
+                                      users.name as user_name, 
+                                      COALESCE(posts.user_photo, users.photo) as user_photo, 
                                       (SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.id) as like_count, 
                                       (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) as comment_count 
                                       FROM posts 
@@ -68,9 +89,10 @@ class Post {
         return false;
     }
 
-    public function editPost($id, $message, $photo, $forSale) {
-        $stmt = $this->conn->prepare("UPDATE posts SET message = ?, photo = ?, for_sale = ? WHERE id = ?");
-        $stmt->bind_param("ssii", $message, $photo, $forSale, $id);
+    public function editPost($id, $message, $photo, $forSale, $price, $itemDescription) {
+        $sql = "UPDATE posts SET message = ?, photo = ?, for_sale = ?, price = ?, item_description = ? WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("ssidsi", $message, $photo, $forSale, $price, $itemDescription, $id);
         return $stmt->execute();
     }
 
@@ -87,13 +109,13 @@ class Post {
             return false;
         }
 
-        $stmt = $this->conn->prepare("INSERT INTO comments (post_id, user_id, content) VALUES (?, ?, ?)");
+        $stmt = $this->conn->prepare("INSERT INTO comments (post_id, user_id, content, created_at) VALUES (?, ?, ?, NOW())");
         $stmt->bind_param("iis", $postId, $userId, $content);
         $result = $stmt->execute();
         $stmt->close();
 
         if ($result) {
-            $notificationMessage = (isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'A user') . " commented on your post!";
+            $notificationMessage = "commented on your post!";
             notif($postOwnerId, $notificationMessage, $this->conn);
             return true;
         }
@@ -109,24 +131,24 @@ class Post {
         $row = $result->fetch_assoc();
         $postOwnerId = $row['user_id'];
         $stmt->close();
-
+    
         if (!$postOwnerId) {
             return false;
         }
-
-        $stmt = $this->conn->prepare("INSERT INTO likes (post_id, user_id) VALUES (?, ?)");
+    
+        $stmt = $this->conn->prepare("INSERT INTO likes (post_id, user_id, created_at) VALUES (?, ?, NOW())");
         $stmt->bind_param("ii", $postId, $userId);
         $result = $stmt->execute();
         $stmt->close();
-
+    
         if ($result) {
-            $notificationMessage = (isset($_SESSION['user_name']) ? $_SESSION['user_name'] : " liked your post!") ;
+            $notificationMessage = "liked your post!";
             notif($postOwnerId, $notificationMessage, $this->conn);
             return true;
         }
-
+    
         return false;
-    }
+    } 
 
     public function removeLike($postId, $userId) {
         $stmt = $this->conn->prepare("DELETE FROM likes WHERE post_id = ? AND user_id = ?");
@@ -143,7 +165,7 @@ class Post {
     }
 
     public function getComments($postId) {
-        $stmt = $this->conn->prepare("SELECT comments.*, users.name as user_name 
+        $stmt = $this->conn->prepare("SELECT comments.*, users.name as user_name, users.photo as user_photo
                                       FROM comments 
                                       LEFT JOIN users ON comments.user_id = users.id 
                                       WHERE comments.post_id = ? 
@@ -157,7 +179,12 @@ class Post {
         }
         return $comments;
     }
+
+    public function updateUserPhotoInPosts($userId, $newPhotoPath) {
+        $stmt = $this->conn->prepare("UPDATE posts SET user_photo = ? WHERE user_id = ?");
+        $stmt->bind_param("si", $newPhotoPath, $userId);
+        return $stmt->execute();
+    }
 }
 ?>
-
 

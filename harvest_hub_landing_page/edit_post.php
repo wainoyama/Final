@@ -14,7 +14,7 @@ if (isset($_GET['id'])) {
         $photo = '';
 
         if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = './uploads/';
+            $uploadDir = './harvest_hub_landing_page/uploads/';
             $uploadFile = $uploadDir . basename($_FILES['photo']['name']);
 
             if (move_uploaded_file($_FILES['photo']['tmp_name'], $uploadFile)) {

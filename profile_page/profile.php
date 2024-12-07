@@ -55,12 +55,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 if (isset($_FILES['profile_picture'])) {
-    $target_dir = "../uploads/";
+    $target_dir = "../harvest_hub_landing_page/uploads/";
     $target_file = $target_dir . basename($_FILES["profile_picture"]["name"]);
     $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
     if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
-        $photo_path = "uploads/" . basename($_FILES["profile_picture"]["name"]);
+        $photo_path = "harvest_hub_landing_page/uploads/" . basename($_FILES["profile_picture"]["name"]);
         
         // Start transaction to ensure both updates succeed or fail together
         $conn->begin_transaction();
@@ -86,6 +86,9 @@ if (isset($_FILES['profile_picture'])) {
             
             $success_message = "Profile picture updated successfully!";
             $user['photo'] = $photo_path;
+            
+            // Add this line to set the session variable
+            $_SESSION['new_profile_picture'] = $photo_path;
             
         } catch (Exception $e) {
             // If any query fails, roll back the transaction
@@ -132,7 +135,7 @@ if (isset($_FILES['profile_picture'])) {
                     <?php if ($user['photo']): ?>
                         <img src="../<?php echo htmlspecialchars($user['photo']); ?>" alt="Profile Picture" class="profile-img">
                     <?php else: ?>
-                        <img src="../uploads/default-profile.jpg" alt="Default Profile Picture" class="profile-img">
+                        <img src="../harvest_hub_landing_page/uploads/default-profile.jpg" alt="Default Profile Picture" class="profile-img">
                     <?php endif; ?>
                 </div>
             
