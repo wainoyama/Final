@@ -1,0 +1,175 @@
+body {
+    font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    background-color: rgb(201, 201, 201);
+    color: #1c1e21;
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    background-color: #ffffff;
+    padding: 15px 0;
+    border-bottom: 1px solid #dddfe2;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-radius: 20px;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0ac700;
+    text-decoration: none;
+}
+
+nav {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+nav a {
+    text-decoration: none;
+    color: #1c1e21;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+nav a:hover, nav a.active {
+    background-color: #f0f2f5;
+    color: #0ac700;
+}
+
+.auth-buttons a {
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+.btn-login {
+    color: #1c1e21;
+}
+
+.btn-signup {
+    background-color: #0ac700;
+    color: white;
+}
+
+.btn-signup:hover {
+    background-color: #098f00;
+}
+
+.btn-logout {
+    background-color: #f44336;
+    color: white;
+}
+
+.btn-logout:hover {
+    background-color: #d32f2f;
+}
+.data-section {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.data-section h2 {
+    color: #0ac700;
+    margin-bottom: 20px;
+}
+
+.table-container {
+    background-color: #f0f8f0;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+}
+
+table.dataTable {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+table.dataTable thead th {
+    background-color: #0ac700;
+    color: white;
+    font-weight: bold;
+    text-align: left;
+    padding: 10px;
+}
+
+table.dataTable tbody td {
+    background-color: #ffffff;
+    padding: 10px;
+    border-bottom: 1px solid #dddfe2;
+}
+
+table.dataTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    background-color: #f0f8f0;
+    border: 1px solid #0ac700;
+    color: #0ac700 !important;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin: 0 2px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background-color: #0ac700;
+    color: white !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background-color: #0ac700;
+    color: white !important;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid #0ac700;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .table-container {
+        padding: 10px;
+    }
+}
+
