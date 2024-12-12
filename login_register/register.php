@@ -1,20 +1,27 @@
 <?php
-include('./db.php');
+include('../db.php');
 
-$name = $email = $password = $phone = $location = $profilePicture = '';
+$name = $email = $password = $confirmPassword = $phone = $location = $profilePicture = '';
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
     $email = $_POST['email'];
     $password = $_POST['password'];
+    $confirmPassword = $_POST['confirmPassword'];
     $phone = $_POST['phone'];
     $location = $_POST['location'];
 
+    // Password validation
     if (!preg_match('/[A-Z]/', $password) || 
         !preg_match('/[0-9].*[0-9].*[0-9]/', $password) || 
         !preg_match('/[\W_]/', $password)) { 
         $errors[] = 'Password must include at least one uppercase letter, three numbers, and one special character.';
+    }
+
+    // Confirm password validation
+    if ($password !== $confirmPassword) {
+        $errors[] = 'Passwords do not match.';
     }
 
     if (isset($_FILES['profilePicture']) && $_FILES['profilePicture']['error'] == 0) {
@@ -34,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         $sql = 'INSERT INTO users (name, email, phone, password, location, photo) 
-                VALUES ( ?, ?, ?, ?, ?, ?)';
+                VALUES (?, ?, ?, ?, ?, ?)';
         $stmt = $conn->prepare($sql);
         $stmt->bind_param(
             'ssssss',
@@ -79,7 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                 <?php endif; ?>
 
-<<<<<<< HEAD
                 <form method="POST" enctype="multipart/form-data" class="form-container">
                     <div class="form-group">
                         <label for="name">Name:</label>
@@ -95,38 +101,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <label for="password">Password:</label>
                         <input type="password" id="password" name="password" required>
                     </div>
-=======
-    <?php if (!empty($errors)): ?>
-        <ul>
-            <?php foreach ($errors as $error): ?>
-                <li><?php echo htmlspecialchars($error); ?></li>
-            <?php endforeach; ?>
-        </ul>
-    <?php endif; ?>
 
-    <form method="POST" enctype="multipart/form-data">
-        <label for="name">Name:</label>
-        <input type="text" name="name" value="<?php echo htmlspecialchars($name); ?>" required><br><br>
-
-        <label for="email">Email:</label>
-        <input type="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required><br><br>
->>>>>>> branch/silva
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password:</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    </div>
 
                     <div class="form-group">
                         <label for="phone">Phone Number:</label>
                         <input type="tel" id="phone" name="phone" value="<?php echo htmlspecialchars($phone); ?>" required>
                     </div>
 
-<<<<<<< HEAD
                     <div class="form-group">
                         <label for="location">Location:</label>
                         <select id="location" name="location" required>
                             <option value="">Select Location</option>
-                            <option value="Cavite">Cavite</option>
-                            <option value="Laguna">Laguna</option>
-                            <option value="Batangas">Batangas</option>
-                            <option value="Quezon">Quezon</option>
-                            <option value="Rizal">Rizal</option>
+                            <option value="Cavite" <?php if($location == 'Cavite') echo 'selected'; ?>>Cavite</option>
+                            <option value="Laguna" <?php if($location == 'Laguna') echo 'selected'; ?>>Laguna</option>
+                            <option value="Batangas" <?php if($location == 'Batangas') echo 'selected'; ?>>Batangas</option>
+                            <option value="Quezon" <?php if($location == 'Quezon') echo 'selected'; ?>>Quezon</option>
+                            <option value="Rizal" <?php if($location == 'Rizal') echo 'selected'; ?>>Rizal</option>
                         </select>
                     </div>
 
@@ -134,13 +128,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <label for="profilePicture">Profile Picture:</label>
                         <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
                     </div>
-=======
-        <label for="phone">Phone Number:</label>
-        <input type="text" name="phone" value="<?php echo htmlspecialchars($phone); ?>" required><br><br>
-
-        <label for="location">Location:</label>
-        <input type="text" name="location" value="<?php echo htmlspecialchars($location); ?>" required><br><br>
->>>>>>> branch/silva
 
                     <button type="submit" class="btn-primary">Register</button>
                 </form>
@@ -150,7 +137,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
             </div>
         </div>
-
     </div>
 </body>
 </html>
