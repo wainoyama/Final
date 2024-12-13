@@ -62,17 +62,14 @@ if (isset($_FILES['profile_picture'])) {
     if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
         $photo_path = "harvest_hub_landing_page/uploads/" . basename($_FILES["profile_picture"]["name"]);
         
-        // Start transaction to ensure both updates succeed or fail together
         $conn->begin_transaction();
         
         try {
-            // Update user's profile photo
             $update_photo_sql = "UPDATE users SET photo = ? WHERE id = ?";
             $update_photo_stmt = $conn->prepare($update_photo_sql);
             $update_photo_stmt->bind_param("si", $photo_path, $user_id);
             $update_photo_stmt->execute();
 
-            // Update all posts by this user to reflect the new photo
             $update_posts_sql = "UPDATE posts p 
                                JOIN users u ON p.user_id = u.id 
                                SET p.user_photo = u.photo 
@@ -81,17 +78,14 @@ if (isset($_FILES['profile_picture'])) {
             $update_posts_stmt->bind_param("i", $user_id);
             $update_posts_stmt->execute();
 
-            // If both queries succeed, commit the transaction
             $conn->commit();
             
             $success_message = "Profile picture updated successfully!";
             $user['photo'] = $photo_path;
             
-            // Add this line to set the session variable
             $_SESSION['new_profile_picture'] = $photo_path;
             
         } catch (Exception $e) {
-            // If any query fails, roll back the transaction
             $conn->rollback();
             $error_message = "Error updating profile picture: " . $e->getMessage();
         }
@@ -131,14 +125,19 @@ if (isset($_FILES['profile_picture'])) {
         <div class="content">
             <h1>Your Profile</h1>
             <div class="profile-container">
-                <div class="profile-picture">
-                    <?php if ($user['photo']): ?>
-                        <img src="../<?php echo htmlspecialchars($user['photo']); ?>" alt="Profile Picture" class="profile-img">
-                    <?php else: ?>
-                        <img src="../harvest_hub_landing_page/uploads/default-profile.jpg" alt="Default Profile Picture" class="profile-img">
-                    <?php endif; ?>
+                <div class="profile-header">
+                    <div class="profile-picture">
+                        <?php if ($user['photo']): ?>
+                            <img src="../<?php echo htmlspecialchars($user['photo']); ?>" alt="Profile Picture" class="profile-img">
+                        <?php else: ?>
+                            <img src="../harvest_hub_landing_page/uploads/default-profile.jpg" alt="Default Profile Picture" class="profile-img">
+                        <?php endif; ?>
+                    </div>
+                    <div class="orders-button">
+                        <a href="./your_orders.php" class="btn-primary">Your Orders</a>
+                    </div>
                 </div>
-            
+
                 <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data" class="profile-form">
                     <div class="form-group">
                         <label for="profile_picture">Update Profile Picture:</label>
