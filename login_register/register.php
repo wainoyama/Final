@@ -101,7 +101,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <label for="password">Password:</label>
                         <input type="password" id="password" name="password" required>
                     </div>
-=======
     <?php if (!empty($errors)): ?>
         <ul>
             <?php foreach ($errors as $error): ?>
@@ -116,7 +115,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <label for="email">Email:</label>
         <input type="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required><br><br>
->>>>>>> branch/silva
 
                     <div class="form-group">
                         <label for="phone">Phone Number:</label>
