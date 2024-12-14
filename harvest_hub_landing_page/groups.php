@@ -45,7 +45,7 @@ $posts = $result->fetch_all(MYSQLI_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harvest Hub Group Page</title>
+    <title>Calabarzon Harvest Hub Group Page</title>
     <link rel="stylesheet" href="../css/groups.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -54,7 +54,7 @@ $posts = $result->fetch_all(MYSQLI_ASSOC);
     <header>
         <div class="header-content">
             <div class="logo">
-                <span>Harvest Hub</span>
+                <span>Calabarzon Harvest Hub</span>
             </div>
             <nav>
                 <a href="../index.php"><i class="fas fa-home"></i> Home</a>
@@ -68,7 +68,7 @@ $posts = $result->fetch_all(MYSQLI_ASSOC);
     </header>
 
     <div class="container">
-        <h1>Welcome to the Harvest Hub Group Page</h1>
+        <h1>Welcome to the Calabarzon Harvest Hub Group Page</h1>
 
         <div class="content">
             <h2>Create a Post</h2>
@@ -106,7 +106,7 @@ $posts = $result->fetch_all(MYSQLI_ASSOC);
     </div>
 
     <footer>
-        <p>&copy; 2023 Harvest Hub. All rights reserved.</p>
+        <p>&copy; 2023 Calabarzon Harvest Hub. All rights reserved.</p>
     </footer>
 
     <script>

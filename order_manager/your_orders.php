@@ -10,9 +10,15 @@ include('../db.php');
 
 $user_id = $_SESSION['user_id'];
 
-// Query to fetch orders for the logged-in user
-$sql = "SELECT * FROM orders WHERE user_id = ? ORDER BY order_date DESC";
+// Query to fetch orders for the logged-in user as a buyer
+$sql = "SELECT * FROM orders WHERE buyer_id = ? ORDER BY created_at DESC"; // Use created_at instead of order_date
 $stmt = $conn->prepare($sql);
+
+if ($stmt === false) {
+    // Output the error message
+    die("Error preparing statement: " . $conn->error);
+}
+
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -28,8 +34,8 @@ while ($row = $result->fetch_assoc()) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Orders - Harvest Hub</title>
-    <link rel="stylesheet" href="../css/orders.css">
+    <title>Your Orders - Calabarzon Harvest Hub</title>
+    <link rel="stylesheet" href="../css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -105,7 +111,7 @@ while ($row = $result->fetch_assoc()) {
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Harvest Hub. All rights reserved.</p>
+                <p>&copy; 2024 Calabarzon Havest Hub. All rights reserved.</p>
             </div>
         </footer>
     </div>

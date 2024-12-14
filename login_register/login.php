@@ -33,12 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Harvest Hub</title>
+    <title>Login - Calabarzon Harvest Hub</title>
     <link rel="stylesheet" href="../css/login.css">
 </head>
 <body>
     <div class="container">
-        <h1>Login to Harvest Hub</h1>
+        <h1>Login to Calabarzon Harvest Hub</h1>
         <?php if (isset($error)): ?>
             <p class="error"><?php echo $error; ?></p>
         <?php endif; ?>

@@ -20,8 +20,7 @@
       <div class="logo">CALABARZON Harvest Hub</div>
       <nav>
         <ul>
-          <li><a href="index.php">Home</a></li>
-          <li><a href="aboutus.php">About</a></li>
+          <li><a href="../index.php">Home</a></li>
           <li><a href="contactpage.php">Contact</a></li>
         </ul>
       </nav>
@@ -34,7 +33,7 @@
     <div class="team">
       <?php foreach ($members as $member): ?>
         <div class="team-member">
-          <img src="images/<?php echo htmlspecialchars($member['img']); ?>" alt="<?php echo htmlspecialchars($member['name']); ?>" />
+          <img src="<?php echo htmlspecialchars($member['img']); ?>" alt="<?php echo htmlspecialchars($member['name']); ?>" />
           <h3><?php echo htmlspecialchars($member['name']); ?></h3>
           <p><strong>Role:</strong> <?php echo htmlspecialchars($member['role']); ?></p>
           <p><strong>Tasks:</strong> <?php echo htmlspecialchars($member['tasks']); ?></p>

@@ -187,4 +187,6 @@ p {
 .result p {
     margin-bottom: 5px;
 }
-
+body footer{
+    align-items: center;
+}

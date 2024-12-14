@@ -102,7 +102,6 @@ if (isset($_FILES['profile_picture'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile - Harvest Hub</title>
     <link rel="stylesheet" href="../css/profile.css">
-    <link rel="stylesheet" href="../css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -110,14 +109,14 @@ if (isset($_FILES['profile_picture'])) {
     <div class="container">
         <header>
             <div class="header-content">
-                <div class="logo"><span>Harvest Hub</span></div>
+                <div class="logo"><span>Calabarzon Harvest Hub</span></div>
                 <nav>
                     <a href="../index.php"><i class="fas fa-home"></i> Home</a>
                     <a href="../harvest_hub_landing_page/community.php"><i class="fas fa-users"></i> Community</a>
                     <a href="./profile.php" class="active"><i class="fas fa-user"></i> Profile</a>
                 </nav>
-                <div class="auth-buttons">
-                    <a href="../logout.php" class="btn-logout">Log Out</a>
+                <div class="orders-button">
+                        <a href="../order_manager/your_orders.php" >Your Orders</a>
                 </div>
             </div>
         </header>
@@ -132,9 +131,6 @@ if (isset($_FILES['profile_picture'])) {
                      class="profile-img">
             </div>
 
-                    <div class="orders-button">
-                        <a href="./your_orders.php" class="btn-primary">Your Orders</a>
-                    </div>
                 </div>
 
                 <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data" class="profile-form">
@@ -186,7 +182,7 @@ if (isset($_FILES['profile_picture'])) {
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Harvest Hub. All rights reserved.</p>
+                <p>&copy; 2024 Calabarzon Havest Hub. All rights reserved.</p>
             </div>
         </footer>
     </div>

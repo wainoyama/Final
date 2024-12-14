@@ -19,7 +19,7 @@ class Post {
         $sql = "INSERT INTO posts (message, photo, for_sale, price, item_description, user_id, user_photo, timestamp) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
         $stmt = $this->conn->prepare($sql);
-        $photoPath = $photo ? '../uploads/' . basename($photo) : null;
+        $photoPath = $photo ? './uploads/' . basename($photo) : null;
     
         // Get the user's current photo
         $userPhotoSql = "SELECT photo FROM users WHERE id = ?";

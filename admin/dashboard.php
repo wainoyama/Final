@@ -10,7 +10,7 @@
     <div class="dashboard">
         <aside class="sidebar">
             <div class="logo">
-                <h1>Harvest Hub</h1>
+                <h1>Calabarzon Harvest Hub</h1>
             </div>
             <nav>
                 <ul>
