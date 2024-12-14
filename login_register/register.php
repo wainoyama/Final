@@ -101,20 +101,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <label for="password">Password:</label>
                         <input type="password" id="password" name="password" required>
                     </div>
-    <?php if (!empty($errors)): ?>
-        <ul>
-            <?php foreach ($errors as $error): ?>
-                <li><?php echo htmlspecialchars($error); ?></li>
-            <?php endforeach; ?>
-        </ul>
-    <?php endif; ?>
 
-    <form method="POST" enctype="multipart/form-data">
-        <label for="name">Name:</label>
-        <input type="text" name="name" value="<?php echo htmlspecialchars($name); ?>" required><br><br>
-
-        <label for="email">Email:</label>
-        <input type="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required><br><br>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password:</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    </div>
 
                     <div class="form-group">
                         <label for="phone">Phone Number:</label>
