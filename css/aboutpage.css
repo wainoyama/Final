@@ -1,104 +1,47 @@
-body {
-    background-image: url('images/homepage.jpg');
-    background-size: cover;
-    background-position: center;
-    font-family: Arial, sans-serif;
-    color: white;
-    margin: 0;
-    padding: 0;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    background-position: center center;
-}
-
-
-header {
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 20px;
-    text-align: center;
-}
-
-header nav ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-header nav ul li {
-    display: inline;
-    margin-right: 20px;
-}
-
-header nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-}
-
-header nav ul li a:hover {
-    color: red;
-}
-
-
-.project-name {
-    color: white;
-    font-size: 36px;
-    font-weight: bold;
-    margin-top: 20px;
-}
-
-
-.about-description {
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 20px;
-    margin-top: 50px;
-    border-radius: 10px;
-    text-align: center;
-    color: rgb(250, 250, 250);
-}
-
-.about-description h2 {
-    font-size: 30px;
-}
-
-.about-description p {
-    font-size: 18px;
-}
-
-
 .team {
     display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 40px;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-bottom: 40px;
 }
 
 .team-member {
-    text-align: center;
-    max-width: 200px;
-    background-color: #f2f2f2;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    width: calc(33.33% - 20px);
+    text-align: center;
 }
 
 .team-member img {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    border: 2px solid rgba(255, 255, 255, 0.6);
-    transition: all ease-in-out 0.5s;
-}
-
-.team-member img:hover {
-    width: 120%;
-}
-
-.team-member img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
     object-fit: cover;
+    margin-bottom: 15px;
 }
 
-.team-member h3,
-.team-member p {
-    color: black;
-    margin: 10px 0;
+.team-member h3 {
+    margin-bottom: 10px;
+    color: #0ac700;
 }
+
+.team-member p {
+    margin-bottom: 5px;
+}
+
+.about-description {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.about-description h2 {
+    color: #0ac700;
+    margin-bottom: 15px;
+}
+

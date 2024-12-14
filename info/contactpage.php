@@ -1,36 +1,9 @@
-<?php
-include('db.php'); 
-
-$error_message = '';
-$success_message = '';
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = htmlspecialchars(trim($_POST['name']));
-    $email = htmlspecialchars(trim($_POST['email']));
-    $message = htmlspecialchars(trim($_POST['message']));
-
-    if (empty($name) || empty($email) || empty($message)) {
-        $error_message = "Please fill out all fields.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error_message = "Please enter a valid email address.";
-    } else {
-        $stmt = $conn->prepare("INSERT INTO contact_messages (name, email, message) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $name, $email, $message);
-
-        if ($stmt->execute()) {
-            $success_message = "Thank you for reaching out! We have received your message.";
-        } else {
-            $error_message = "There was an error submitting your message. Please try again later.";
-        }
-        $stmt->close();
-    }
-}
-?>
-
 <!DOCTYPE html>
 <head>
   <title>Contact Us - CALABARZON Harvest Hub</title>
-  <link rel="stylesheet" href="contactpage.css" />
+  <link rel="stylesheet" href="../css/contactpage.css">
+  <link rel="stylesheet" href="../css/common.css">
+  <link rel="stylesheet" href="../css/aboutus.css">
 </head>
 <body>
 
@@ -47,18 +20,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <div class="container">
   <h2>Contact Us</h2>
-
-  <?php if (!empty($error_message)): ?>
-    <div class="error-message">
-      <p><?php echo htmlspecialchars($error_message); ?></p>
-    </div>
-  <?php endif; ?>
-
-  <?php if (!empty($success_message)): ?>
-    <div class="success-message">
-      <p><?php echo htmlspecialchars($success_message); ?></p>
-    </div>
-  <?php endif; ?>
 
   <form action="contactpage.php" method="POST" class="contact-form">
     <label for="name">Your Name:</label>

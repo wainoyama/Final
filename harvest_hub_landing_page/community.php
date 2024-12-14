@@ -152,7 +152,7 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
                     <?php if (!empty($notifications)): ?>
                         <ul>
                             <?php foreach ($notifications as $notif): ?>
-                                <li>
+                                <li class="notification-item" data-notification-id="<?= $notif['id'] ?>">
                                     <span><?= htmlspecialchars($notif['message']) ?></span>
                                     <small><?= date('F j, Y g:i a', strtotime($notif['created_at'])) ?></small>
                                 </li>
@@ -254,7 +254,7 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
                                     <form method="POST" action="../order_manager/order_product.php">
                                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                         <input type="hidden" name="post_id" value="<?= $postItem['id'] ?>">
-                                        <button type="submit" class="buy-btn">Buy Now</button>
+                                        <button type="submit" class="buy-btn" onclick="return confirmPurchase(<?= $postItem['id'] ?>)">Buy Now</button>
                                     </form>
                                 </div>
                             <?php elseif ($postItem['for_sale'] && $postItem['order_status'] === 'sold'): ?>
@@ -289,108 +289,131 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
             });
             <?php unset($_SESSION['success_message']); ?>
         <?php endif; ?>
-        $(document).ready(function() {
-            $('#search-input').on('input', function() {
-                var searchTerm = $(this).val();
-                if (searchTerm.length >= 3) {
-                    $.ajax({
-                        url: 'search_user.php',
-                        method: 'GET',
-                        data: {
-                            search: searchTerm
-                        },
-                        success: function(response) {
-                            $('#search-results').html(response);
-                        }
-                    });
-                } else {
-                    $('#search-results').empty();
-                }
-            });
-        });
 
-        function toggleCommentForm(postId) {
-            var form = document.getElementById('comment-form-' + postId);
-            form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function toggleForSaleFields() {
-            const forSaleFields = document.getElementById('for_sale_fields');
-            const forSaleCheckbox = document.getElementById('for_sale');
-            forSaleFields.style.display = forSaleCheckbox.checked ? 'block' : 'none';
-        }
-
-        function refreshPosts() {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', 'fetch_posts.php', true);
-            xhr.onload = function() {
-                if (xhr.status == 200) {
-                    var response = JSON.parse(xhr.responseText);
-                    if (response.success) {
-                        document.getElementById('posts').innerHTML = response.html;
-                        if (response.message) {
-                            Swal.fire({
-                                title: 'Success!',
-                                text: response.message,
-                                icon: 'success',
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    } else {
-                        console.error('Error refreshing posts:', response.message);
+    $(document).ready(function() {
+        $('#search-input').on('input', function() {
+            var searchTerm = $(this).val();
+            if (searchTerm.length >= 3) {
+                $.ajax({
+                    url: 'search_user.php',
+                    method: 'GET',
+                    data: { search: searchTerm },
+                    success: function(response) {
+                        $('#search-results').html(response);
                     }
-                }
-            };
-            xhr.send();
-        }
-
-        setInterval(refreshPosts, 5000);
-
-        function confirmPurchase(postId) {
-            return new Promise((resolve) => {
-                Swal.fire({
-                    title: 'Confirm Purchase',
-                    text: 'Are you sure you want to buy this item?',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, buy it!',
-                    cancelButtonText: 'No, cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.querySelector(`form[action="../order_manager/order_product.php"] input[name="post_id"][value="${postId}"]`)
-                            .closest('form')
-                            .submit();
-                    }
-                    resolve(false);
                 });
-            });
-        }
+            } else {
+                $('#search-results').empty();
+            }
+        });
+    });
 
-        function markNotificationAsRead(notificationId) {
-            fetch('mark_notification_read.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'notification_id=' + notificationId
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Remove the notification from the list
-                    document.querySelector(`[data-notification-id="${notificationId}"]`).remove();
+    function toggleCommentForm(postId) {
+        var form = document.getElementById('comment-form-' + postId);
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function toggleForSaleFields() {
+        const forSaleFields = document.getElementById('for-sale_fields');
+        const forSaleCheckbox = document.getElementById('for_sale');
+        forSaleFields.style.display = forSaleCheckbox.checked ? 'block' : 'none';
+    }
+
+    function refreshPosts() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'fetch_posts.php', true);
+        xhr.onload = function() {
+            if (xhr.status == 200) {
+                var response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    document.getElementById('posts').innerHTML = response.html;
+                    if (response.message) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: response.message,
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Error refreshing posts: ' + response.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
                 }
-            })
-            .catch(error => console.error('Error:', error));
-        }
+            }
+        };
+        xhr.send();
+    }
 
-        // Add click event listeners to all notification items
-        document.querySelectorAll('.notification-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const notificationId = this.getAttribute('data-notification-id');
-                markNotificationAsRead(notificationId);
+    setInterval(refreshPosts, 5000);
+
+    function confirmPurchase(postId) {
+        return new Promise((resolve) => {
+            Swal.fire({
+                title: 'Confirm Purchase',
+                text: 'Are you sure you want to buy this item?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, buy it!',
+                cancelButtonText: 'No, cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.querySelector(`form[action="../order_manager/order_product.php"] input[name="post_id"][value="${postId}"]`)
+                        .closest('form')
+                        .submit();
+                }
+                resolve(result.isConfirmed);
             });
         });
+    }
+
+    function markNotificationAsRead(notificationId) {
+        fetch('mark_notification_read.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'notification_id=' + notificationId
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.querySelector(`[data-notification-id="${notificationId}"]`).remove();
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Notification marked as read',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to mark notification as read',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error!',
+                text: 'An unexpected error occurred',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        });
+    }
+
+    document.querySelectorAll('.notification-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const notificationId = this.getAttribute('data-notification-id');
+            markNotificationAsRead(notificationId);
+        });
+    });
     </script>
 </body>
 
