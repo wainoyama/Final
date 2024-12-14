@@ -186,9 +186,10 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
                         <div class="post">
                             <div class="post-header">
                                 <div class="user-info">
-                                    <img src="<?= !empty($postItem['user_photo']) ? htmlspecialchars($postItem['user_photo']) : 'uploads/default-avatar.png' ?>"
+                                    <img src="<?= !empty($postItem['user_photo']) ? '../'.htmlspecialchars($postItem['user_photo']) : 'uploads/default-avatar.png' ?>"
                                         alt="User avatar"
-                                        class="avatar">
+                                        class="avatar"
+                                        style="object-fit: cover;">
                                     <div>
                                         <h3><?= htmlspecialchars($postItem['user_name'] ?? 'Anonymous') ?></h3>
                                         <small><?= date('F j \a\t g:i a', strtotime($postItem['timestamp'])) ?> · <i class="fas fa-globe"></i></small>

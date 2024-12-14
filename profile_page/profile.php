@@ -123,16 +123,15 @@ if (isset($_FILES['profile_picture'])) {
         </header>
         
         <div class="content">
-            <h1>Your Profile</h1>
-            <div class="profile-container">
-                <div class="profile-header">
-                    <div class="profile-picture">
-                        <?php if ($user['photo']): ?>
-                            <img src="../<?php echo htmlspecialchars($user['photo']); ?>" alt="Profile Picture" class="profile-img">
-                        <?php else: ?>
-                            <img src="../harvest_hub_landing_page/uploads/default-profile.jpg" alt="Default Profile Picture" class="profile-img">
-                        <?php endif; ?>
-                    </div>
+    <h1>Your Profile</h1>
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-picture">
+                <img src="../<?php echo htmlspecialchars($user['photo'] ?: '../harvest_hub_landing_page/uploads/default-profile.jpg'); ?>" 
+                     alt="Profile Picture" 
+                     class="profile-img">
+            </div>
+
                     <div class="orders-button">
                         <a href="./your_orders.php" class="btn-primary">Your Orders</a>
                     </div>

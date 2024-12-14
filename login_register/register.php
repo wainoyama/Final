@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (isset($_FILES['profilePicture']) && $_FILES['profilePicture']['error'] == 0) {
-        $profilePicture = 'harvest_hub_landing_page/uploads/' . basename($_FILES['profilePicture']['name']);
+        $profilePicture = '../harvest_hub_landing_page/uploads/' . basename($_FILES['profilePicture']['name']);
         move_uploaded_file($_FILES['profilePicture']['tmp_name'], $profilePicture);
     }
 
