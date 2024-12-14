@@ -129,7 +129,7 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
                 </nav>
                 <div class="auth-buttons">
                     <?php if (isLoggedIn()): ?>
-                        <a href="logout.php" class="btn-logout">Log Out</a>
+                        <a href="../login_register/logout.php" class="btn-logout">Log Out</a>
                     <?php else: ?>
                         <a href="./login.php" class="btn-login">Log In</a>
                         <a href="register.php" class="btn-signup">Sign Up</a>
@@ -208,7 +208,7 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
                                 <?php endif; ?>
                                 <?php if ($postItem['for_sale']): ?>
                                     <div class="for-sale-info">
-                                        <p><strong>Price:</strong> $<?= number_format($postItem['price'], 2) ?></p>
+                                        <p><strong>Price:</strong> Php<?= number_format($postItem['price'], 2) ?></p>
                                         <p><strong>Description:</strong> <?= htmlspecialchars($postItem['item_description']) ?></p>
                                         <p><strong>Status:</strong> <?= ucfirst($postItem['order_status']) ?></p>
                                     </div>
@@ -272,7 +272,7 @@ $notifications = unreadNotif($_SESSION['user_id'], $conn);
                 <div class="harvest-group-container">
                     <h2>Harvest Group</h2>
                     <p>View the groups you are connected to know updates from your group!</p>
-                    <a href="group.php" class="btn-open-groups">Open groups</a>
+                    <a href="groups.php" class="btn-open-groups">Open groups</a>
                 </div>
             </div>
         </div>

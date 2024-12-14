@@ -46,7 +46,7 @@ require_once 'auth_check.php';
 
             <div class="welcome-section">
                 <h1>Welcome to Harvest Hub</h1>
-
+                        
                 <p>Connect with farmers, share your harvest, and explore sustainable agriculture.</p>
             </div>
 
@@ -72,7 +72,8 @@ require_once 'auth_check.php';
                 </div>
             </div>
         </div>
-
+        <div>
+        </div>
         <footer>
             <div class="footer-content">
                 <div class="footer-section">

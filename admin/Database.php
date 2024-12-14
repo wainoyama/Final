@@ -1,7 +1,7 @@
 <?php
 class Database {
     private $host = "localhost";
-    private $db_name = "uploads"; 
+    private $db_name = "calabarzon_harvest_hub"; 
     private $username = "root"; 
     private $password = ""; 
     public $conn;

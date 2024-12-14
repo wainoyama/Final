@@ -2,7 +2,7 @@
 $host = 'localhost';
 $username = 'root';
 $password = '';
-$dbname = 'uploads';
+$dbname = 'calabarzon_harvest_hub';
 
 try {
     $conn = new mysqli($host, $username, $password, $dbname);

@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$dbname = 'uploads';
+$dbname = 'calabarzon_harvest_hub';
 $username = 'root';
 $password = '';
 

@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "search";
+$dbname = "calabarzon_harvest_hub";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

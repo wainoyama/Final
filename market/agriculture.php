@@ -2,7 +2,7 @@
 session_start();
 // Database connection parameters
 $host = 'localhost';
-$dbname = 'agriculture';
+$dbname = 'calabarzon_harvest_hub';
 $username = 'root';
 $password = '';
 
