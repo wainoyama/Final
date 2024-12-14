@@ -1,6 +1,9 @@
 <?php
 
-function notif($user_id, $message, $conn) {
+function notif($user_id, $message, $conn, $user_name = null) {
+    if ($user_name) {
+        $message = "$user_name $message"; 
+    }
     $stmt = $conn->prepare("INSERT INTO notifications (user_id, message, created_at) VALUES (?, ?, NOW())");
     $stmt->bind_param("is", $user_id, $message);
     $stmt->execute();

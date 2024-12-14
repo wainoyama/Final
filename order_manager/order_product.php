@@ -38,15 +38,18 @@ $stmt->bind_param("iiis", $postId, $buyerId, $sellerId, $post['item_description'
 
 if ($stmt->execute()) {
     $orderId = $stmt->insert_id;
-    
+
     // Update post status
     $updateStmt = $conn->prepare("UPDATE posts SET order_status = 'sold' WHERE id = ?");
     $updateStmt->bind_param("i", $postId);
     $updateStmt->execute();
-    
-    // Notify seller
-    $notificationMessage = "has placed an order for your product.";
-    notif($sellerId, $notificationMessage, $conn);
+
+    // Get the user's name
+    $userNameStmt = $conn->prepare("SELECT name FROM users WHERE id = ?");
+    $userNameStmt->bind_param("i", $userId);
+    $userNameStmt->execute();
+    $userNameResult = $userNameStmt->get_result();
+    $userName = $userNameResult->fetch_assoc()['name'];
     
     $_SESSION['success_message'] = "Order placed successfully!";
     header('Location: ../harvest_hub_landing_page/community.php');

@@ -104,22 +104,28 @@ class Post {
         $row = $result->fetch_assoc();
         $postOwnerId = $row['user_id'];
         $stmt->close();
-
+    
         if (!$postOwnerId) {
             return false;
         }
-
+    
         $stmt = $this->conn->prepare("INSERT INTO comments (post_id, user_id, content, created_at) VALUES (?, ?, ?, NOW())");
         $stmt->bind_param("iis", $postId, $userId, $content);
         $result = $stmt->execute();
         $stmt->close();
-
+    
         if ($result) {
+            $userNameStmt = $this->conn->prepare("SELECT name FROM users WHERE id = ?");
+            $userNameStmt->bind_param("i", $userId);
+            $userNameStmt->execute();
+            $userNameResult = $userNameStmt->get_result();
+            $userName = $userNameResult->fetch_assoc()['name'];
+    
             $notificationMessage = "commented on your post!";
-            notif($postOwnerId, $notificationMessage, $this->conn);
+            notif($postOwnerId, $notificationMessage, $this->conn, $userName); // Pass the user's name
             return true;
         }
-
+    
         return false;
     }
 
@@ -142,13 +148,20 @@ class Post {
         $stmt->close();
     
         if ($result) {
+            // Get the user's name
+            $userNameStmt = $this->conn->prepare("SELECT name FROM users WHERE id = ?");
+            $userNameStmt->bind_param("i", $userId);
+            $userNameStmt->execute();
+            $userNameResult = $userNameStmt->get_result();
+            $userName = $userNameResult->fetch_assoc()['name'];
+    
             $notificationMessage = "liked your post!";
-            notif($postOwnerId, $notificationMessage, $this->conn);
+            notif($postOwnerId, $notificationMessage, $this->conn, $userName); // Pass the user's name
             return true;
         }
     
         return false;
-    } 
+    }
 
     public function removeLike($postId, $userId) {
         $stmt = $this->conn->prepare("DELETE FROM likes WHERE post_id = ? AND user_id = ?");
