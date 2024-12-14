@@ -142,6 +142,96 @@ try {
                 </table>
             </div>
         </section>
+
+        <section class="data-section">
+            <h2>Types of Produce</h2>
+            <div class="table-container">
+                <table id="produceTable" class="display">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Definition</th>
+                            <th>Preservation Tips</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Fruit</td>
+                            <td>Apple</td>
+                            <td>A sweet, edible fruit produced by an apple tree.</td>
+                            <td>Keep in a cool, dry place.</td>
+                        </tr>
+                        <tr>
+                            <td>Fruit</td>
+                            <td>Banana</td>
+                            <td>A long, curved fruit with a thick skin and soft flesh.</td>
+                            <td>Store at room temperature.</td>
+                        </tr>
+                        <tr>
+                            <td>Fruit</td>
+                            <td>Cherry</td>
+                            <td>A small, round stone fruit that is typically bright or dark red.</td>
+                            <td>Refrigerate for longer freshness.</td>
+                        </tr>
+                        <tr>
+                            <td>Fruit</td>
+                            <td>Grapes</td>
+                            <td>Small, round fruits that grow in bunches on vines.</td>
+                            <td>Store in the refrigerator.</td>
+                        </tr>
+                        <tr>
+                            <td>Fruit</td>
+                            <td>Orange</td>
+                            <td>A round citrus fruit with a tough, bright orange skin.</td>
+                            <td>Keep in a cool place, or refrigerate.</td>
+                        </tr>
+                        <tr>
+                            <td>Fruit</td>
+                            <td>Strawberry</td>
+                            <td>A red, sweet fruit with tiny seeds on its surface.</td>
+                            <td>Store in the refrigerator and consume quickly.</td>
+                        </tr>
+                        <tr>
+                            <td>Vegetable</td>
+                            <td>Carrot</td>
+                            <td>A root vegetable, usually orange in color, rich in vitamins.</td>
+                            <td>Refrigerate to keep fresh.</td>
+                        </tr>
+                        <tr>
+                            <td>Vegetable</td>
+                            <td>Lettuce</td>
+                            <td>A leafy green vegetable often used in salads.</td>
+                            <td>Keep in a sealed container in the fridge.</td>
+                        </tr>
+                        <tr>
+                            <td>Vegetable</td>
+                            <td>Tomato</td>
+                            <td>A red or yellowish fruit with a juicy pulp, used in salads and cooking.</td>
+                            <td>Store at room temperature; refrigerate only if cut.</td>
+                        </tr>
+                        <tr>
+                            <td>Vegetable</td>
+                            <td>Spinach</td>
+                            <td>A leafy green vegetable that is rich in iron and vitamins.</td>
+                            <td>Keep in a plastic bag in the fridge.</td>
+                        </tr>
+                        <tr>
+                            <td>Vegetable</td>
+                            <td>Cucumber</td>
+                            <td>A long, green vegetable that is often eaten raw in salads.</td>
+                            <td>Store in the refrigerator.</td>
+                        </tr>
+                        <tr>
+                            <td>Vegetable</td>
+                            <td>Broccoli</td>
+                            <td>A green vegetable resembling a tree with a thick stalk and florets.</td>
+                            <td>Keep refrigerated in a bag.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
 
     <script>
@@ -149,8 +239,8 @@ try {
             $('#productsTable').DataTable();
             $('#regionsTable').DataTable();
             $('#marketStocksTable').DataTable();
+            $('#produceTable').DataTable();
         });
     </script>
 </body>
 </html>
-
